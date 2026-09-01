@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://kaikei-demo-2026.ktanzyl.chatgpt.site'),
   title: 'Kaikei Demo — Personal expenses, made clear',
   description:
     'Try Kaikei with synthetic finances stored only in your browser.',
