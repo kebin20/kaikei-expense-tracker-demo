@@ -44,14 +44,14 @@ Clearing site data or using a different browser starts a separate demo session. 
 
 ## Demo versus production
 
-| Area | Demo | Production Kaikei |
-|---|---|---|
-| Financial records | Fictional sample data | Owner's private financial data |
-| Persistence | Browser `localStorage` | Private Google Sheet with server-side sync |
-| Cross-device sync | No | Yes, through the Sheet |
-| Reset button | Restores the bundled sample | Not provided |
-| Deployment | Separate Sites project | Separate owner-only Sites project |
-| Repository | This demo repository | Private production repository |
+| Area              | Demo                        | Production Kaikei                          |
+| ----------------- | --------------------------- | ------------------------------------------ |
+| Financial records | Fictional sample data       | Owner's private financial data             |
+| Persistence       | Browser `localStorage`      | Private Google Sheet with server-side sync |
+| Cross-device sync | No                          | Yes, through the Sheet                     |
+| Reset button      | Restores the bundled sample | Not provided                               |
+| Deployment        | Public Sites project        | Separate owner-only Sites project          |
+| Repository        | This demo repository        | Private production repository              |
 
 The two apps have separate source histories, deployments, and storage behavior. No production balance, transaction, category, spreadsheet credential, or Sheet content is included here.
 
@@ -81,10 +81,15 @@ Kaikei uses Ant Design as its interface foundation, extended with a custom orang
 app/
   globals.css          Responsive Kaikei visual system
   layout.tsx           Metadata, PWA, iOS, and social configuration
-  page.tsx             Demo state and all dashboard workflows
+  page.tsx             Demo state and immediately rendered overview
   providers.tsx        Ant Design app provider
+components/
+  transactions-view.tsx  On-demand transaction ledger
+  transaction-modal.tsx  On-demand transaction editor
+  budget-modal.tsx       On-demand planned-amount editor
 lib/
   seed-data.json       Fictional monthly budgets and transactions
+  ledger-types.ts      Shared ledger data types
 public/
   icons/               App and iOS home-screen icons
   manifest.webmanifest Installable-app manifest
@@ -134,7 +139,9 @@ Browsers that support WebMCP can use the focused `add_transaction` action to add
 
 ## Deployment
 
-The demo is built and published independently through OpenAI Sites. A deployment contains only the compiled application and synthetic seed data. Production Google Sheet settings and secrets must never be added to this project.
+The public demo is built and published independently through OpenAI Sites. A deployment contains only the compiled application and synthetic seed data. Production Google Sheet settings and secrets must never be added to this project.
+
+The overview and sample ledger render immediately. Heavier transaction-table and editing controls are split into on-demand browser chunks, so they are downloaded only when a visitor opens those features.
 
 ## Privacy notes
 

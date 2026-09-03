@@ -5,11 +5,9 @@
 import ArrowDownOutlined from '@ant-design/icons/ArrowDownOutlined';
 import ArrowUpOutlined from '@ant-design/icons/ArrowUpOutlined';
 import BarChartOutlined from '@ant-design/icons/BarChartOutlined';
-import DeleteOutlined from '@ant-design/icons/DeleteOutlined';
 import EditOutlined from '@ant-design/icons/EditOutlined';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
 import ProfileOutlined from '@ant-design/icons/ProfileOutlined';
-import SearchOutlined from '@ant-design/icons/SearchOutlined';
 import SwapOutlined from '@ant-design/icons/SwapOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
 import {
@@ -17,83 +15,36 @@ import {
   App,
   Button,
   Card,
-  DatePicker,
   Empty,
-  Form,
-  Input,
-  InputNumber,
   Layout,
   Menu,
-  Modal,
-  Popconfirm,
   Progress,
   Segmented,
   Select,
   Space,
-  Table,
   Tag,
   Tooltip,
   Typography,
 } from 'antd';
-import type { TableColumnsType } from 'antd';
-import dayjs, { type Dayjs } from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import demoSeedData from '@/lib/seed-data.json';
+import type {
+  BudgetPlan,
+  DemoTransactionInput,
+  LedgerData,
+  LedgerTransaction,
+  LedgerType,
+} from '@/lib/ledger-types';
+
+const TransactionModal = lazy(() => import('@/components/transaction-modal'));
+const BudgetModal = lazy(() => import('@/components/budget-modal'));
+const TransactionsView = lazy(() => import('@/components/transactions-view'));
 
 const { Sider, Content } = Layout;
 const { Text, Title } = Typography;
 
-type LedgerType = 'expense' | 'income';
 type ViewKey = 'overview' | 'transactions' | 'budgets';
-
-interface LedgerTransaction {
-  id: string;
-  transactionDate: string;
-  period: string;
-  type: LedgerType;
-  amount: number;
-  description: string;
-  category: string;
-  source: string;
-  createdAt: number;
-}
-
-interface BudgetPlan {
-  id: string;
-  period: string;
-  type: LedgerType;
-  category: string;
-  plannedAmount: number;
-  updatedAt: number;
-}
-
-interface LedgerData {
-  transactions: LedgerTransaction[];
-  budgets: BudgetPlan[];
-  initialBalance: number;
-  sourceFile: string;
-  seedVersion: string;
-}
-
-interface TransactionFormValues {
-  type: LedgerType;
-  amount: number;
-  transactionDate: Dayjs;
-  description: string;
-  category: string[];
-}
-
-interface BudgetFormValues {
-  plannedAmount: number;
-}
-
-interface DemoTransactionInput {
-  type: LedgerType;
-  amount: number;
-  transactionDate: string;
-  description: string;
-  category: string;
-}
 
 const DEMO_STORAGE_KEY = 'kaikei-demo-ledger-v1';
 
@@ -128,16 +79,6 @@ function greeting() {
   return 'Good evening';
 }
 
-function transactionPayload(values: TransactionFormValues) {
-  return {
-    type: values.type,
-    amount: Math.round(values.amount),
-    transactionDate: values.transactionDate.format('YYYY-MM-DD'),
-    description: values.description.trim(),
-    category: values.category[0]?.trim(),
-  };
-}
-
 function freshDemoLedger(): LedgerData {
   return JSON.parse(JSON.stringify(demoSeedData)) as LedgerData;
 }
@@ -160,7 +101,10 @@ function demoText(value: unknown) {
   return typeof value === 'string' ? value : '';
 }
 
-function makeDemoTransaction(input: DemoTransactionInput, id = crypto.randomUUID()) {
+function makeDemoTransaction(
+  input: DemoTransactionInput,
+  id = crypto.randomUUID(),
+) {
   return {
     id,
     transactionDate: input.transactionDate,
@@ -181,26 +125,33 @@ export default function Home() {
   const [view, setView] = useState<ViewKey>('overview');
   const [selectedPeriod, setSelectedPeriod] = useState('2026-09');
   const [transactionOpen, setTransactionOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<LedgerTransaction | null>(null);
+  const [editingTransaction, setEditingTransaction] =
+    useState<LedgerTransaction | null>(null);
   const [savingTransaction, setSavingTransaction] = useState(false);
+  const [newTransactionType, setNewTransactionType] =
+    useState<LedgerType>('expense');
   const [filterType, setFilterType] = useState<'all' | LedgerType>('all');
   const [search, setSearch] = useState('');
   const [budgetType, setBudgetType] = useState<LedgerType>('expense');
   const [editingBudget, setEditingBudget] = useState<BudgetPlan | null>(null);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [savingBudget, setSavingBudget] = useState(false);
-  const [transactionForm] = Form.useForm<TransactionFormValues>();
-  const [budgetForm] = Form.useForm<BudgetFormValues>();
 
   const loadLedger = () => {
     setError('');
     try {
       const data = readDemoLedger();
       setLedger(data);
-      const latest = [...new Set(data.budgets.map((item) => item.period))].sort().at(-1);
+      const latest = [...new Set(data.budgets.map((item) => item.period))]
+        .sort()
+        .at(-1);
       if (latest) setSelectedPeriod(latest);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Kaikei could not load your ledger.');
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : 'Kaikei could not load your ledger.',
+      );
     }
   };
 
@@ -227,22 +178,33 @@ export default function Home() {
         {
           name: 'add_transaction',
           title: 'Add a Kaikei transaction',
-          description: 'Create one income or expense entry and update the visible Kaikei ledger.',
+          description:
+            'Create one income or expense entry and update the visible Kaikei ledger.',
           inputSchema: {
             type: 'object',
             properties: {
-              transactionDate: { type: 'string', description: 'Date in YYYY-MM-DD format.' },
+              transactionDate: {
+                type: 'string',
+                description: 'Date in YYYY-MM-DD format.',
+              },
               type: { type: 'string', enum: ['expense', 'income'] },
               amount: { type: 'number', exclusiveMinimum: 0 },
               description: { type: 'string', minLength: 1, maxLength: 120 },
               category: { type: 'string', minLength: 1, maxLength: 80 },
             },
-            required: ['transactionDate', 'type', 'amount', 'description', 'category'],
+            required: [
+              'transactionDate',
+              'type',
+              'amount',
+              'description',
+              'category',
+            ],
             additionalProperties: false,
           },
           annotations: { readOnlyHint: false, untrustedContentHint: false },
           async execute(input) {
-            if (!input || typeof input !== 'object') throw new Error('Invalid transaction.');
+            if (!input || typeof input !== 'object')
+              throw new Error('Invalid transaction.');
             const value = input as Record<string, unknown>;
             const item = makeDemoTransaction({
               transactionDate: demoText(value.transactionDate),
@@ -251,12 +213,20 @@ export default function Home() {
               description: demoText(value.description),
               category: demoText(value.category),
             });
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(item.transactionDate) || item.amount <= 0 || !item.description || !item.category) {
+            if (
+              !/^\d{4}-\d{2}-\d{2}$/.test(item.transactionDate) ||
+              item.amount <= 0 ||
+              !item.description ||
+              !item.category
+            ) {
               throw new Error('Invalid transaction.');
             }
             setLedger((current) => {
               if (!current) return current;
-              const next = { ...current, transactions: [item, ...current.transactions] };
+              const next = {
+                ...current,
+                transactions: [item, ...current.transactions],
+              };
               persistDemoLedger(next);
               return next;
             });
@@ -281,12 +251,15 @@ export default function Home() {
   }, [ledger]);
 
   const monthTransactions = useMemo(
-    () => ledger?.transactions.filter((item) => item.period === selectedPeriod) || [],
+    () =>
+      ledger?.transactions.filter((item) => item.period === selectedPeriod) ||
+      [],
     [ledger, selectedPeriod],
   );
 
   const monthBudgets = useMemo(
-    () => ledger?.budgets.filter((item) => item.period === selectedPeriod) || [],
+    () =>
+      ledger?.budgets.filter((item) => item.period === selectedPeriod) || [],
     [ledger, selectedPeriod],
   );
 
@@ -329,7 +302,8 @@ export default function Home() {
       ledger.transactions
         .filter((item) => item.period <= selectedPeriod)
         .reduce(
-          (sum, item) => sum + (item.type === 'income' ? item.amount : -item.amount),
+          (sum, item) =>
+            sum + (item.type === 'income' ? item.amount : -item.amount),
           0,
         )
     );
@@ -338,7 +312,9 @@ export default function Home() {
   const flowData = useMemo(() => {
     if (!ledger) return [];
     return periods.map((period) => {
-      const items = ledger.transactions.filter((item) => item.period === period);
+      const items = ledger.transactions.filter(
+        (item) => item.period === period,
+      );
       return {
         period,
         label: compactMonth(period),
@@ -364,7 +340,9 @@ export default function Home() {
   const budgetRows = useMemo(() => {
     const plans = monthBudgets.filter((item) => item.type === budgetType);
     const byCategory = new Map(plans.map((item) => [item.category, item]));
-    for (const item of monthTransactions.filter((entry) => entry.type === budgetType)) {
+    for (const item of monthTransactions.filter(
+      (entry) => entry.type === budgetType,
+    )) {
       if (!byCategory.has(item.category)) {
         byCategory.set(item.category, {
           id: `new-${selectedPeriod}-${budgetType}-${item.category}`,
@@ -382,7 +360,13 @@ export default function Home() {
         actual: categoryActuals.get(`${budgetType}:${item.category}`) || 0,
       }))
       .sort((a, b) => b.plannedAmount - a.plannedAmount || b.actual - a.actual);
-  }, [budgetType, categoryActuals, monthBudgets, monthTransactions, selectedPeriod]);
+  }, [
+    budgetType,
+    categoryActuals,
+    monthBudgets,
+    monthTransactions,
+    selectedPeriod,
+  ]);
 
   const budgetPulse = useMemo(
     () =>
@@ -410,48 +394,39 @@ export default function Home() {
 
   const allCategories = useMemo(() => {
     if (!ledger) return [];
-    return [...new Set([...ledger.transactions.map((item) => item.category), ...ledger.budgets.map((item) => item.category)])]
+    return [
+      ...new Set([
+        ...ledger.transactions.map((item) => item.category),
+        ...ledger.budgets.map((item) => item.category),
+      ]),
+    ]
       .sort()
       .map((value) => ({ label: value, value }));
   }, [ledger]);
 
   const openNewTransaction = (type: LedgerType = 'expense') => {
     setEditingTransaction(null);
-    transactionForm.resetFields();
-    transactionForm.setFieldsValue({
-      type,
-      transactionDate: dayjs(`${selectedPeriod}-01`),
-      category: [],
-    });
+    setNewTransactionType(type);
     setTransactionOpen(true);
   };
 
   const openEditTransaction = (item: LedgerTransaction) => {
     setEditingTransaction(item);
-    transactionForm.setFieldsValue({
-      type: item.type,
-      amount: item.amount,
-      transactionDate: dayjs(item.transactionDate),
-      description: item.description,
-      category: [item.category],
-    });
     setTransactionOpen(true);
   };
 
-  const saveTransaction = async () => {
+  const saveTransaction = async (input: DemoTransactionInput) => {
     try {
-      const values = await transactionForm.validateFields();
       setSavingTransaction(true);
-      const item = makeDemoTransaction(
-        transactionPayload(values),
-        editingTransaction?.id,
-      );
+      const item = makeDemoTransaction(input, editingTransaction?.id);
       setLedger((current) => {
         if (!current) return current;
         const next = {
           ...current,
           transactions: editingTransaction
-            ? current.transactions.map((entry) => (entry.id === item.id ? item : entry))
+            ? current.transactions.map((entry) =>
+                entry.id === item.id ? item : entry,
+              )
             : [item, ...current.transactions],
         };
         persistDemoLedger(next);
@@ -459,7 +434,9 @@ export default function Home() {
       });
       setSelectedPeriod(item.period);
       setTransactionOpen(false);
-      message.success(editingTransaction ? 'Transaction updated' : 'Transaction added');
+      message.success(
+        editingTransaction ? 'Transaction updated' : 'Transaction added',
+      );
     } catch (caught) {
       if (caught instanceof Error) message.error(caught.message);
     } finally {
@@ -480,26 +457,30 @@ export default function Home() {
       });
       message.success('Transaction deleted');
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : 'Could not delete the transaction.');
+      message.error(
+        caught instanceof Error
+          ? caught.message
+          : 'Could not delete the transaction.',
+      );
     }
   };
 
   const openBudgetEditor = (item: BudgetPlan) => {
     setEditingBudget(item);
-    budgetForm.setFieldsValue({ plannedAmount: item.plannedAmount });
     setBudgetOpen(true);
   };
 
-  const saveBudget = async () => {
+  const saveBudget = async (plannedAmount: number) => {
     if (!editingBudget) return;
     try {
-      const values = await budgetForm.validateFields();
       setSavingBudget(true);
       const item: BudgetPlan = {
         ...editingBudget,
-        id: editingBudget.id.startsWith('new-') ? crypto.randomUUID() : editingBudget.id,
+        id: editingBudget.id.startsWith('new-')
+          ? crypto.randomUUID()
+          : editingBudget.id,
         period: selectedPeriod,
-        plannedAmount: Math.round(values.plannedAmount),
+        plannedAmount,
         updatedAt: Date.now(),
       };
       setLedger((current) => {
@@ -534,75 +515,6 @@ export default function Home() {
     }
   };
 
-  const columns: TableColumnsType<LedgerTransaction> = [
-    {
-      title: 'Date',
-      dataIndex: 'transactionDate',
-      width: 112,
-      render: (value: string) => dayjs(value).format('MMM D'),
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      render: (value: string, item) => (
-        <div className="table-description">
-          <Text strong>{value}</Text>
-          {item.source !== 'manual' && <Text type="secondary">Sample transaction</Text>}
-        </div>
-      ),
-    },
-    {
-      title: 'Category',
-      dataIndex: 'category',
-      responsive: ['md'],
-      render: (value: string) => <Tag>{value}</Tag>,
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      width: 108,
-      responsive: ['lg'],
-      render: (value: LedgerType) => (
-        <Tag color={value === 'income' ? 'green' : 'orange'}>{value}</Tag>
-      ),
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-      align: 'right',
-      width: 140,
-      render: (value: number, item) => (
-        <Text strong className={item.type === 'income' ? 'amount-income' : ''}>
-          {item.type === 'income' ? '+' : '−'}{formatMoney(value)}
-        </Text>
-      ),
-    },
-    {
-      title: '',
-      key: 'actions',
-      align: 'right',
-      width: 84,
-      render: (_value, item) => (
-        <Space size={2}>
-          <Tooltip title="Edit">
-            <Button type="text" icon={<EditOutlined />} onClick={() => openEditTransaction(item)} />
-          </Tooltip>
-          <Popconfirm
-            title="Delete this transaction?"
-            description="This cannot be undone."
-            okText="Delete"
-            okButtonProps={{ danger: true }}
-            onConfirm={() => deleteTransaction(item.id)}
-          >
-            <Tooltip title="Delete">
-              <Button type="text" danger icon={<DeleteOutlined />} />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
   if (error) {
     return (
       <div className="loading-shell">
@@ -618,16 +530,32 @@ export default function Home() {
   }
 
   const cashFlow = monthIncome - monthExpense;
-  const spendPercent = plannedExpense ? Math.round((monthExpense / plannedExpense) * 100) : 0;
-  const incomePercent = plannedIncome ? Math.round((monthIncome / plannedIncome) * 100) : 0;
-  const maxFlow = Math.max(...flowData.flatMap((item) => [item.income, item.expense]), 1);
+  const spendPercent = plannedExpense
+    ? Math.round((monthExpense / plannedExpense) * 100)
+    : 0;
+  const incomePercent = plannedIncome
+    ? Math.round((monthIncome / plannedIncome) * 100)
+    : 0;
+  const maxFlow = Math.max(
+    ...flowData.flatMap((item) => [item.income, item.expense]),
+    1,
+  );
 
   return (
     <Layout className="app-shell">
       <Sider className="desktop-sider" width={248} theme="light">
         <div className="brand-lockup">
-          <img src="/icons/icon-192.png" alt="" width={44} height={44} className="brand-icon" />
-          <div><strong>Kaikei</strong><span>Personal finance</span></div>
+          <img
+            src="/icons/icon-192.png"
+            alt=""
+            width={44}
+            height={44}
+            className="brand-icon"
+          />
+          <div>
+            <strong>Kaikei</strong>
+            <span>Personal finance</span>
+          </div>
         </div>
         <Menu
           mode="inline"
@@ -635,31 +563,53 @@ export default function Home() {
           onClick={({ key }) => setView(key as ViewKey)}
           items={[
             { key: 'overview', icon: <BarChartOutlined />, label: 'Overview' },
-            { key: 'transactions', icon: <SwapOutlined />, label: 'Transactions' },
+            {
+              key: 'transactions',
+              icon: <SwapOutlined />,
+              label: 'Transactions',
+            },
             { key: 'budgets', icon: <ProfileOutlined />, label: 'Budgets' },
           ]}
         />
         <div className="sidebar-note">
           <WalletOutlined />
-          <div><Text strong>Demo workspace</Text><Text type="secondary">Synthetic data · saved on this device</Text></div>
+          <div>
+            <Text strong>Demo workspace</Text>
+            <Text type="secondary">Synthetic data · saved on this device</Text>
+          </div>
         </div>
       </Sider>
 
       <Layout>
         <header className="topbar">
           <button className="mobile-brand" onClick={() => setView('overview')}>
-            <img src="/icons/icon-192.png" alt="" width={36} height={36} /><strong>Kaikei</strong>
+            <img src="/icons/icon-192.png" alt="" width={36} height={36} />
+            <strong>Kaikei</strong>
           </button>
-          <div className="topbar-copy"><Text type="secondary">Your money, in one calm place</Text><Tag color="orange">Demo</Tag></div>
+          <div className="topbar-copy">
+            <Text type="secondary">Your money, in one calm place</Text>
+            <Tag color="orange">Demo</Tag>
+          </div>
           <Space>
-            <Button className="reset-demo-button" onClick={resetDemo}>Reset demo</Button>
+            <Button className="reset-demo-button" onClick={resetDemo}>
+              Reset demo
+            </Button>
             <Select
               className="month-select"
               value={selectedPeriod}
               onChange={setSelectedPeriod}
-              options={[...periods].reverse().map((period) => ({ label: monthLabel(period), value: period }))}
+              options={[...periods]
+                .reverse()
+                .map((period) => ({
+                  label: monthLabel(period),
+                  value: period,
+                }))}
             />
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => openNewTransaction()}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openNewTransaction()}
+            >
               <span className="add-button-label">Add transaction</span>
             </Button>
           </Space>
@@ -670,50 +620,95 @@ export default function Home() {
             <>
               <section className="page-heading">
                 <div>
-                  <Text className="eyebrow">{monthLabel(selectedPeriod).toUpperCase()}</Text>
+                  <Text className="eyebrow">
+                    {monthLabel(selectedPeriod).toUpperCase()}
+                  </Text>
                   <Title level={1}>{greeting()}</Title>
-                  <Text type="secondary">Here’s how your month is taking shape.</Text>
+                  <Text type="secondary">
+                    Here’s how your month is taking shape.
+                  </Text>
                 </div>
-                <Button onClick={() => setView('transactions')}>See all activity</Button>
+                <Button onClick={() => setView('transactions')}>
+                  See all activity
+                </Button>
               </section>
 
               <section className="metric-grid">
                 <Card className="balance-card" variant="borderless">
                   <Text>Balance through {monthLabel(selectedPeriod)}</Text>
-                  <div className="balance-value">{formatMoney(currentBalance)}</div>
+                  <div className="balance-value">
+                    {formatMoney(currentBalance)}
+                  </div>
                   <Tag className="balance-tag">
-                    {cashFlow >= 0 ? '↑' : '↓'} {formatMoney(Math.abs(cashFlow))} this month
+                    {cashFlow >= 0 ? '↑' : '↓'}{' '}
+                    {formatMoney(Math.abs(cashFlow))} this month
                   </Tag>
                   <div className="balance-orbit" aria-hidden="true" />
                 </Card>
                 <Card className="metric-card">
-                  <div className="metric-icon expense"><ArrowUpOutlined /></div>
+                  <div className="metric-icon expense">
+                    <ArrowUpOutlined />
+                  </div>
                   <Text type="secondary">Spent this month</Text>
                   <Title level={2}>{formatMoney(monthExpense)}</Title>
-                  <Text type="secondary">{spendPercent}% of {formatMoney(plannedExpense)} planned</Text>
-                  <Progress percent={Math.min(spendPercent, 100)} showInfo={false} strokeColor="#f26a21" />
+                  <Text type="secondary">
+                    {spendPercent}% of {formatMoney(plannedExpense)} planned
+                  </Text>
+                  <Progress
+                    percent={Math.min(spendPercent, 100)}
+                    showInfo={false}
+                    strokeColor="#f26a21"
+                  />
                 </Card>
                 <Card className="metric-card">
-                  <div className="metric-icon income"><ArrowDownOutlined /></div>
+                  <div className="metric-icon income">
+                    <ArrowDownOutlined />
+                  </div>
                   <Text type="secondary">Income this month</Text>
                   <Title level={2}>{formatMoney(monthIncome)}</Title>
-                  <Text type="secondary">{incomePercent}% of {formatMoney(plannedIncome)} planned</Text>
-                  <Progress percent={Math.min(incomePercent, 100)} showInfo={false} strokeColor="#102542" />
+                  <Text type="secondary">
+                    {incomePercent}% of {formatMoney(plannedIncome)} planned
+                  </Text>
+                  <Progress
+                    percent={Math.min(incomePercent, 100)}
+                    showInfo={false}
+                    strokeColor="#102542"
+                  />
                 </Card>
               </section>
 
               <section className="dashboard-grid">
-                <Card title="Money flow" extra={<Text type="secondary">Income vs spending</Text>}>
-                  <div className="chart-wrap" aria-label="Monthly income and expense chart">
+                <Card
+                  title="Money flow"
+                  extra={<Text type="secondary">Income vs spending</Text>}
+                >
+                  <div
+                    className="chart-wrap"
+                    aria-label="Monthly income and expense chart"
+                  >
                     <div className="flow-grid" aria-hidden="true">
                       {flowData.map((item) => (
                         <div className="flow-month" key={item.period}>
                           <div className="flow-bars">
-                            <Tooltip title={`Income ${formatMoney(item.income)}`}>
-                              <span className="flow-bar income" style={{ height: `${Math.max((item.income / maxFlow) * 100, item.income ? 2 : 0)}%` }} />
+                            <Tooltip
+                              title={`Income ${formatMoney(item.income)}`}
+                            >
+                              <span
+                                className="flow-bar income"
+                                style={{
+                                  height: `${Math.max((item.income / maxFlow) * 100, item.income ? 2 : 0)}%`,
+                                }}
+                              />
                             </Tooltip>
-                            <Tooltip title={`Expense ${formatMoney(item.expense)}`}>
-                              <span className="flow-bar expense" style={{ height: `${Math.max((item.expense / maxFlow) * 100, item.expense ? 2 : 0)}%` }} />
+                            <Tooltip
+                              title={`Expense ${formatMoney(item.expense)}`}
+                            >
+                              <span
+                                className="flow-bar expense"
+                                style={{
+                                  height: `${Math.max((item.expense / maxFlow) * 100, item.expense ? 2 : 0)}%`,
+                                }}
+                              />
                             </Tooltip>
                           </div>
                           <Text type="secondary">{item.label}</Text>
@@ -721,32 +716,95 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  <div className="chart-legend"><span className="income-dot" />Income<span className="expense-dot" />Expense</div>
+                  <div className="chart-legend">
+                    <span className="income-dot" />
+                    Income
+                    <span className="expense-dot" />
+                    Expense
+                  </div>
                 </Card>
-                <Card title="Recent activity" extra={<Button type="link" onClick={() => setView('transactions')}>See all</Button>}>
+                <Card
+                  title="Recent activity"
+                  extra={
+                    <Button type="link" onClick={() => setView('transactions')}>
+                      See all
+                    </Button>
+                  }
+                >
                   {monthTransactions.length ? (
                     <div className="recent-list">
                       {monthTransactions.slice(0, 5).map((item) => (
-                        <button className="activity-row" key={item.id} onClick={() => openEditTransaction(item)}>
-                          <span className={`activity-icon ${item.type}`}>{item.description.slice(0, 1).toUpperCase()}</span>
-                          <span><Text strong>{item.description}</Text><Text type="secondary">{dayjs(item.transactionDate).format('MMM D')} · {item.category}</Text></span>
-                          <Text strong className={item.type === 'income' ? 'amount-income' : ''}>{item.type === 'income' ? '+' : '−'}{formatMoney(item.amount)}</Text>
+                        <button
+                          className="activity-row"
+                          key={item.id}
+                          onClick={() => openEditTransaction(item)}
+                        >
+                          <span className={`activity-icon ${item.type}`}>
+                            {item.description.slice(0, 1).toUpperCase()}
+                          </span>
+                          <span>
+                            <Text strong>{item.description}</Text>
+                            <Text type="secondary">
+                              {dayjs(item.transactionDate).format('MMM D')} ·{' '}
+                              {item.category}
+                            </Text>
+                          </span>
+                          <Text
+                            strong
+                            className={
+                              item.type === 'income' ? 'amount-income' : ''
+                            }
+                          >
+                            {item.type === 'income' ? '+' : '−'}
+                            {formatMoney(item.amount)}
+                          </Text>
                         </button>
                       ))}
                     </div>
-                  ) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No activity this month" />}
+                  ) : (
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description="No activity this month"
+                    />
+                  )}
                 </Card>
               </section>
 
-              <Card className="budget-pulse-card" title="Budget pulse" extra={<Button type="link" onClick={() => setView('budgets')}>View all budgets</Button>}>
+              <Card
+                className="budget-pulse-card"
+                title="Budget pulse"
+                extra={
+                  <Button type="link" onClick={() => setView('budgets')}>
+                    View all budgets
+                  </Button>
+                }
+              >
                 <div className="budget-pulse-grid">
                   {budgetPulse.map((item) => {
-                    const percent = item.plannedAmount ? Math.round((item.actual / item.plannedAmount) * 100) : 0;
+                    const percent = item.plannedAmount
+                      ? Math.round((item.actual / item.plannedAmount) * 100)
+                      : 0;
                     return (
-                      <button className="pulse-item" key={item.id} onClick={() => { setBudgetType('expense'); setView('budgets'); }}>
-                        <div className="budget-label"><Text strong>{item.category}</Text><Text>{formatMoney(item.actual)}</Text></div>
-                        <Progress percent={Math.min(percent, 100)} showInfo={false} strokeColor={percent > 100 ? '#d94841' : '#f26a21'} />
-                        <Text type="secondary">{percent}% of {formatMoney(item.plannedAmount)}</Text>
+                      <button
+                        className="pulse-item"
+                        key={item.id}
+                        onClick={() => {
+                          setBudgetType('expense');
+                          setView('budgets');
+                        }}
+                      >
+                        <div className="budget-label">
+                          <Text strong>{item.category}</Text>
+                          <Text>{formatMoney(item.actual)}</Text>
+                        </div>
+                        <Progress
+                          percent={Math.min(percent, 100)}
+                          showInfo={false}
+                          strokeColor={percent > 100 ? '#d94841' : '#f26a21'}
+                        />
+                        <Text type="secondary">
+                          {percent}% of {formatMoney(item.plannedAmount)}
+                        </Text>
                       </button>
                     );
                   })}
@@ -756,58 +814,127 @@ export default function Home() {
           )}
 
           {view === 'transactions' && (
-            <>
-              <section className="page-heading transactions-heading">
-                <div><Text className="eyebrow">LEDGER</Text><Title level={1}>Transactions</Title><Text type="secondary">Search, review, and adjust every entry.</Text></div>
-                <Space><Button icon={<ArrowDownOutlined />} onClick={() => openNewTransaction('income')}>Add income</Button><Button type="primary" icon={<PlusOutlined />} onClick={() => openNewTransaction('expense')}>Add expense</Button></Space>
-              </section>
-              <Card className="transactions-card">
-                <div className="transaction-toolbar">
-                  <Segmented
-                    value={filterType}
-                    onChange={(value) => setFilterType(value as 'all' | LedgerType)}
-                    options={[{ label: 'All', value: 'all' }, { label: 'Expenses', value: 'expense' }, { label: 'Income', value: 'income' }]}
-                  />
-                  <Input allowClear prefix={<SearchOutlined />} placeholder="Search description or category" value={search} onChange={(event) => setSearch(event.target.value)} />
-                </div>
-                <div className="desktop-table">
-                  <Table rowKey="id" columns={columns} dataSource={filteredTransactions} pagination={{ pageSize: 20, showSizeChanger: false }} scroll={{ x: 720 }} />
-                </div>
-                <div className="mobile-transaction-list">
-                  {filteredTransactions.map((item) => (
-                    <button className="mobile-transaction" key={item.id} onClick={() => openEditTransaction(item)}>
-                      <span className={`activity-icon ${item.type}`}>{item.description.slice(0, 1).toUpperCase()}</span>
-                      <span><Text strong>{item.description}</Text><Text type="secondary">{dayjs(item.transactionDate).format('MMM D')} · {item.category}</Text></span>
-                      <Text strong className={item.type === 'income' ? 'amount-income' : ''}>{item.type === 'income' ? '+' : '−'}{formatMoney(item.amount)}</Text>
-                    </button>
-                  ))}
-                  {!filteredTransactions.length && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No matching transactions" />}
-                </div>
-              </Card>
-            </>
+            <Suspense fallback={<div className="loading-shell" />}>
+              <TransactionsView
+                transactions={filteredTransactions}
+                filterType={filterType}
+                search={search}
+                onFilterChange={setFilterType}
+                onSearchChange={setSearch}
+                onAdd={openNewTransaction}
+                onEdit={openEditTransaction}
+                onDelete={deleteTransaction}
+              />
+            </Suspense>
           )}
 
           {view === 'budgets' && (
             <>
               <section className="page-heading">
-                <div><Text className="eyebrow">PLAN & COMPARE</Text><Title level={1}>Budgets</Title><Text type="secondary">Keep planned amounts close to what actually happens.</Text></div>
-                <Segmented value={budgetType} onChange={(value) => setBudgetType(value as LedgerType)} options={[{ label: 'Expenses', value: 'expense' }, { label: 'Income', value: 'income' }]} />
+                <div>
+                  <Text className="eyebrow">PLAN & COMPARE</Text>
+                  <Title level={1}>Budgets</Title>
+                  <Text type="secondary">
+                    Keep planned amounts close to what actually happens.
+                  </Text>
+                </div>
+                <Segmented
+                  value={budgetType}
+                  onChange={(value) => setBudgetType(value as LedgerType)}
+                  options={[
+                    { label: 'Expenses', value: 'expense' },
+                    { label: 'Income', value: 'income' },
+                  ]}
+                />
               </section>
               <div className="budget-summary-strip">
-                <div><Text type="secondary">Planned</Text><strong>{formatMoney(budgetType === 'expense' ? plannedExpense : plannedIncome)}</strong></div>
-                <div><Text type="secondary">Actual</Text><strong>{formatMoney(budgetType === 'expense' ? monthExpense : monthIncome)}</strong></div>
-                <div><Text type="secondary">Difference</Text><strong>{formatMoney((budgetType === 'expense' ? plannedExpense - monthExpense : monthIncome - plannedIncome))}</strong></div>
+                <div>
+                  <Text type="secondary">Planned</Text>
+                  <strong>
+                    {formatMoney(
+                      budgetType === 'expense' ? plannedExpense : plannedIncome,
+                    )}
+                  </strong>
+                </div>
+                <div>
+                  <Text type="secondary">Actual</Text>
+                  <strong>
+                    {formatMoney(
+                      budgetType === 'expense' ? monthExpense : monthIncome,
+                    )}
+                  </strong>
+                </div>
+                <div>
+                  <Text type="secondary">Difference</Text>
+                  <strong>
+                    {formatMoney(
+                      budgetType === 'expense'
+                        ? plannedExpense - monthExpense
+                        : monthIncome - plannedIncome,
+                    )}
+                  </strong>
+                </div>
               </div>
               <section className="budget-card-grid">
                 {budgetRows.map((item) => {
-                  const percent = item.plannedAmount ? Math.round((item.actual / item.plannedAmount) * 100) : item.actual ? 100 : 0;
+                  const percent = item.plannedAmount
+                    ? Math.round((item.actual / item.plannedAmount) * 100)
+                    : item.actual
+                      ? 100
+                      : 0;
                   const difference = item.plannedAmount - item.actual;
                   return (
-                    <Card key={`${item.type}-${item.category}`} className="budget-card">
-                      <div className="budget-card-head"><div><Tag color={item.type === 'income' ? 'green' : 'orange'}>{item.type}</Tag><Title level={3}>{item.category}</Title></div><Button type="text" icon={<EditOutlined />} onClick={() => openBudgetEditor(item)} /></div>
-                      <div className="budget-amounts"><div><Text type="secondary">Actual</Text><strong>{formatMoney(item.actual)}</strong></div><div><Text type="secondary">Planned</Text><strong>{formatMoney(item.plannedAmount)}</strong></div></div>
-                      <Progress percent={Math.min(percent, 100)} showInfo={false} strokeColor={percent > 100 && item.type === 'expense' ? '#d94841' : item.type === 'income' ? '#102542' : '#f26a21'} />
-                      <Text className={difference < 0 && item.type === 'expense' ? 'over-budget' : ''}>{item.plannedAmount ? `${formatMoney(Math.abs(difference))} ${difference >= 0 ? 'remaining' : 'over plan'}` : 'No plan set yet'}</Text>
+                    <Card
+                      key={`${item.type}-${item.category}`}
+                      className="budget-card"
+                    >
+                      <div className="budget-card-head">
+                        <div>
+                          <Tag
+                            color={item.type === 'income' ? 'green' : 'orange'}
+                          >
+                            {item.type}
+                          </Tag>
+                          <Title level={3}>{item.category}</Title>
+                        </div>
+                        <Button
+                          type="text"
+                          icon={<EditOutlined />}
+                          onClick={() => openBudgetEditor(item)}
+                        />
+                      </div>
+                      <div className="budget-amounts">
+                        <div>
+                          <Text type="secondary">Actual</Text>
+                          <strong>{formatMoney(item.actual)}</strong>
+                        </div>
+                        <div>
+                          <Text type="secondary">Planned</Text>
+                          <strong>{formatMoney(item.plannedAmount)}</strong>
+                        </div>
+                      </div>
+                      <Progress
+                        percent={Math.min(percent, 100)}
+                        showInfo={false}
+                        strokeColor={
+                          percent > 100 && item.type === 'expense'
+                            ? '#d94841'
+                            : item.type === 'income'
+                              ? '#102542'
+                              : '#f26a21'
+                        }
+                      />
+                      <Text
+                        className={
+                          difference < 0 && item.type === 'expense'
+                            ? 'over-budget'
+                            : ''
+                        }
+                      >
+                        {item.plannedAmount
+                          ? `${formatMoney(Math.abs(difference))} ${difference >= 0 ? 'remaining' : 'over plan'}`
+                          : 'No plan set yet'}
+                      </Text>
                     </Card>
                   );
                 })}
@@ -817,58 +944,55 @@ export default function Home() {
         </Content>
 
         <nav className="mobile-nav" aria-label="Primary navigation">
-          <button className={view === 'overview' ? 'active' : ''} onClick={() => setView('overview')}><BarChartOutlined /><span>Overview</span></button>
-          <button className={view === 'transactions' ? 'active' : ''} onClick={() => setView('transactions')}><SwapOutlined /><span>Transactions</span></button>
-          <button className={view === 'budgets' ? 'active' : ''} onClick={() => setView('budgets')}><ProfileOutlined /><span>Budgets</span></button>
+          <button
+            className={view === 'overview' ? 'active' : ''}
+            onClick={() => setView('overview')}
+          >
+            <BarChartOutlined />
+            <span>Overview</span>
+          </button>
+          <button
+            className={view === 'transactions' ? 'active' : ''}
+            onClick={() => setView('transactions')}
+          >
+            <SwapOutlined />
+            <span>Transactions</span>
+          </button>
+          <button
+            className={view === 'budgets' ? 'active' : ''}
+            onClick={() => setView('budgets')}
+          >
+            <ProfileOutlined />
+            <span>Budgets</span>
+          </button>
         </nav>
       </Layout>
 
-      <Modal
-        title={editingTransaction ? 'Edit transaction' : 'Add transaction'}
-        open={transactionOpen}
-        onCancel={() => setTransactionOpen(false)}
-        onOk={() => void saveTransaction()}
-        okText={editingTransaction ? 'Save changes' : 'Add transaction'}
-        confirmLoading={savingTransaction}
-        destroyOnHidden
-      >
-        <Form form={transactionForm} layout="vertical" className="transaction-form">
-          <Form.Item name="type" label="Type" rules={[{ required: true }]}> 
-            <Segmented block options={[{ label: 'Expense', value: 'expense', icon: <ArrowUpOutlined /> }, { label: 'Income', value: 'income', icon: <ArrowDownOutlined /> }]} />
-          </Form.Item>
-          <div className="form-grid">
-            <Form.Item name="amount" label="Amount" rules={[{ required: true, message: 'Enter an amount' }]}>
-              <InputNumber min={1} precision={0} controls={false} prefix="¥" placeholder="0" />
-            </Form.Item>
-            <Form.Item name="transactionDate" label="Date" rules={[{ required: true, message: 'Choose a date' }]}>
-              <DatePicker format="MMM D, YYYY" />
-            </Form.Item>
-          </div>
-          <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Add a description' }, { max: 120 }]}>
-            <Input placeholder="e.g. Groceries at Seiyu" maxLength={120} />
-          </Form.Item>
-          <Form.Item name="category" label="Category" rules={[{ required: true, message: 'Choose or enter a category' }]} extra="Choose an existing category or type a new one.">
-            <Select mode="tags" maxCount={1} tokenSeparators={[',']} showSearch options={allCategories} placeholder="Choose a category" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {transactionOpen && (
+        <Suspense fallback={null}>
+          <TransactionModal
+            categories={allCategories}
+            defaultType={newTransactionType}
+            editingTransaction={editingTransaction}
+            saving={savingTransaction}
+            selectedPeriod={selectedPeriod}
+            onClose={() => setTransactionOpen(false)}
+            onSave={saveTransaction}
+          />
+        </Suspense>
+      )}
 
-      <Modal
-        title={`Edit ${editingBudget?.category || ''} budget`}
-        open={budgetOpen}
-        onCancel={() => setBudgetOpen(false)}
-        onOk={() => void saveBudget()}
-        okText="Save budget"
-        confirmLoading={savingBudget}
-        destroyOnHidden
-      >
-        <Text type="secondary">{monthLabel(selectedPeriod)} · {editingBudget?.type}</Text>
-        <Form form={budgetForm} layout="vertical" className="budget-form">
-          <Form.Item name="plannedAmount" label="Planned amount" rules={[{ required: true, message: 'Enter a planned amount' }]}>
-            <InputNumber min={0} precision={0} controls={false} prefix="¥" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {budgetOpen && editingBudget && (
+        <Suspense fallback={null}>
+          <BudgetModal
+            budget={editingBudget}
+            month={monthLabel(selectedPeriod)}
+            saving={savingBudget}
+            onClose={() => setBudgetOpen(false)}
+            onSave={saveBudget}
+          />
+        </Suspense>
+      )}
     </Layout>
   );
 }
