@@ -29,7 +29,6 @@ import {
   Progress,
   Segmented,
   Select,
-  Skeleton,
   Space,
   Table,
   Tag,
@@ -117,7 +116,13 @@ function compactMonth(period: string) {
 }
 
 function greeting() {
-  const hour = new Date().getHours();
+  const hour = Number(
+    new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Tokyo',
+    }).format(new Date()),
+  );
   if (hour < 12) return 'Good morning';
   if (hour < 18) return 'Good afternoon';
   return 'Good evening';
@@ -171,8 +176,7 @@ function makeDemoTransaction(input: DemoTransactionInput, id = crypto.randomUUID
 
 export default function Home() {
   const { message } = App.useApp();
-  const [ledger, setLedger] = useState<LedgerData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [ledger, setLedger] = useState<LedgerData>(freshDemoLedger);
   const [error, setError] = useState('');
   const [view, setView] = useState<ViewKey>('overview');
   const [selectedPeriod, setSelectedPeriod] = useState('2026-09');
@@ -188,8 +192,7 @@ export default function Home() {
   const [transactionForm] = Form.useForm<TransactionFormValues>();
   const [budgetForm] = Form.useForm<BudgetFormValues>();
 
-  const loadLedger = async () => {
-    setLoading(true);
+  const loadLedger = () => {
     setError('');
     try {
       const data = readDemoLedger();
@@ -198,14 +201,12 @@ export default function Home() {
       if (latest) setSelectedPeriod(latest);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Kaikei could not load your ledger.');
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const timer = window.setTimeout(() => void loadLedger(), 0);
-    return () => window.clearTimeout(timer);
+    const frame = window.requestAnimationFrame(loadLedger);
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const resetDemo = () => {
@@ -602,16 +603,7 @@ export default function Home() {
     },
   ];
 
-  if (loading) {
-    return (
-      <div className="loading-shell">
-        <img src="/icons/icon-192.png" alt="Kaikei" width={64} height={64} />
-        <Skeleton active paragraph={{ rows: 6 }} />
-      </div>
-    );
-  }
-
-  if (error || !ledger) {
+  if (error) {
     return (
       <div className="loading-shell">
         <Alert
@@ -619,7 +611,7 @@ export default function Home() {
           showIcon
           title="Kaikei could not load"
           description={error}
-          action={<Button onClick={() => void loadLedger()}>Try again</Button>}
+          action={<Button onClick={loadLedger}>Try again</Button>}
         />
       </div>
     );

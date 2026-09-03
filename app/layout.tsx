@@ -1,18 +1,7 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
 import 'antd/dist/reset.css';
 import './globals.css';
 import Providers from './providers';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kaikei-demo-2026.ktanzyl.chatgpt.site'),
@@ -28,10 +17,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/favicon.ico?v=3', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favicon.svg?v=3', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.png?v=3', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png?v=3', sizes: '16x16', type: 'image/png' },
     ],
-    apple: '/icons/apple-touch-icon.png',
+    shortcut: '/favicon.ico?v=3',
+    apple: [{ url: '/apple-touch-icon.png?v=3', sizes: '180x180', type: 'image/png' }],
+    other: [{ rel: 'apple-touch-icon-precomposed', url: '/apple-touch-icon-precomposed.png?v=3' }],
   },
   openGraph: {
     title: 'Kaikei Demo — Personal expenses, made clear',
@@ -62,11 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Providers>{children}</Providers>
-      </body>
+      <body><Providers>{children}</Providers></body>
     </html>
   );
 }

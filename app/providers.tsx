@@ -13,7 +13,7 @@ const theme = {
     colorBorderSecondary: '#e9edf2',
     borderRadius: 12,
     borderRadiusLG: 18,
-    fontFamily: 'var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     boxShadowSecondary: '0 12px 32px rgba(16, 37, 66, 0.09)',
   },
   components: {
