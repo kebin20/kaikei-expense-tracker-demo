@@ -9,22 +9,14 @@ export const metadata: Metadata = {
   description:
     'Try Kaikei with synthetic finances stored only in your browser.',
   applicationName: 'Kaikei Demo',
-  manifest: '/manifest.webmanifest',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Kaikei Demo',
-  },
   icons: {
     icon: [
-      { url: '/favicon.ico?v=3', sizes: '32x32', type: 'image/x-icon' },
-      { url: '/favicon.svg?v=3', type: 'image/svg+xml' },
-      { url: '/favicon-32x32.png?v=3', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-16x16.png?v=3', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon.ico?v=7', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favicon.svg?v=7', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.png?v=7', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png?v=7', sizes: '16x16', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico?v=3',
-    apple: [{ url: '/apple-touch-icon.png?v=3', sizes: '180x180', type: 'image/png' }],
-    other: [{ rel: 'apple-touch-icon-precomposed', url: '/apple-touch-icon-precomposed.png?v=3' }],
+    shortcut: '/favicon.ico?v=7',
   },
   openGraph: {
     title: 'Kaikei Demo — Personal expenses, made clear',
@@ -55,6 +47,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest?v=7" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-v7.png" />
+        <link
+          rel="apple-touch-icon-precomposed"
+          sizes="180x180"
+          href="/apple-touch-icon-v7.png"
+        />
+      </head>
       <body><Providers>{children}</Providers></body>
     </html>
   );
