@@ -9,10 +9,10 @@
   "background_color": "#f6f7f9",
   "theme_color": "#102542",
   "icons": [
-    { "src": "/apple-touch-icon-v7.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-192-v7.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512-v7.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512-v7.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "/icons/icon-1024-v7.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+    { "src": "/apple-touch-icon-v8.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-v8.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512-v8.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512-maskable-v8.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-1024-v8.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
   ]
 }

@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   applicationName: 'Kaikei Demo',
   icons: {
     icon: [
-      { url: '/favicon.ico?v=7', sizes: '32x32', type: 'image/x-icon' },
-      { url: '/favicon.svg?v=7', type: 'image/svg+xml' },
-      { url: '/favicon-32x32.png?v=7', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-16x16.png?v=7', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-v8.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favicon-v8.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32x32-v8.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16-v8.png', sizes: '16x16', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico?v=7',
+    shortcut: '/favicon-v8.ico',
   },
   openGraph: {
     title: 'Kaikei Demo — Personal expenses, made clear',
@@ -48,12 +48,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href="/manifest.webmanifest?v=7" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-v7.png" />
+        <link rel="manifest" href="/manifest.webmanifest?v=8" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-v8.png" />
         <link
           rel="apple-touch-icon-precomposed"
           sizes="180x180"
-          href="/apple-touch-icon-v7.png"
+          href="/apple-touch-icon-v8.png"
         />
       </head>
       <body><Providers>{children}</Providers></body>
