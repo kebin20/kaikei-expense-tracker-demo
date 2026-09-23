@@ -1,6 +1,6 @@
 {
-  "name": "sites-project",
-  "version": "0.1.0",
+  "name": "kaikei-expense-tracker-demo",
+  "version": "3.0.0",
   "private": true,
   "engines": {
     "node": ">=22.13.0"

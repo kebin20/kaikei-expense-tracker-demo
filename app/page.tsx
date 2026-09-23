@@ -6,8 +6,11 @@ import ArrowDownOutlined from '@ant-design/icons/ArrowDownOutlined';
 import ArrowUpOutlined from '@ant-design/icons/ArrowUpOutlined';
 import BarChartOutlined from '@ant-design/icons/BarChartOutlined';
 import EditOutlined from '@ant-design/icons/EditOutlined';
+import MoonOutlined from '@ant-design/icons/MoonOutlined';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
 import ProfileOutlined from '@ant-design/icons/ProfileOutlined';
+import ReloadOutlined from '@ant-design/icons/ReloadOutlined';
+import SunOutlined from '@ant-design/icons/SunOutlined';
 import SwapOutlined from '@ant-design/icons/SwapOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
 import {
@@ -28,6 +31,7 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { useKaikeiTheme } from '@/app/providers';
 import demoSeedData from '@/lib/seed-data.json';
 import type {
   BudgetPlan,
@@ -120,6 +124,7 @@ function makeDemoTransaction(
 
 export default function Home() {
   const { message } = App.useApp();
+  const { mode, toggleTheme } = useKaikeiTheme();
   const [ledger, setLedger] = useState<LedgerData>(freshDemoLedger);
   const [error, setError] = useState('');
   const [view, setView] = useState<ViewKey>('overview');
@@ -136,6 +141,7 @@ export default function Home() {
   const [editingBudget, setEditingBudget] = useState<BudgetPlan | null>(null);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [savingBudget, setSavingBudget] = useState(false);
+  const [flowMode, setFlowMode] = useState<'year' | 'month'>('year');
 
   const loadLedger = () => {
     setError('');
@@ -159,6 +165,10 @@ export default function Home() {
     const frame = window.requestAnimationFrame(loadLedger);
     return () => window.cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [view]);
 
   const resetDemo = () => {
     const data = freshDemoLedger();
@@ -536,24 +546,31 @@ export default function Home() {
   const incomePercent = plannedIncome
     ? Math.round((monthIncome / plannedIncome) * 100)
     : 0;
+  const visibleFlowData =
+    flowMode === 'month'
+      ? flowData.filter((item) => item.period === selectedPeriod)
+      : flowData;
   const maxFlow = Math.max(
-    ...flowData.flatMap((item) => [item.income, item.expense]),
+    ...visibleFlowData.flatMap((item) => [item.income, item.expense]),
     1,
   );
 
   return (
     <Layout className="app-shell">
-      <Sider className="desktop-sider" width={248} theme="light">
+      <Sider className="desktop-sider" width={216} theme="dark">
         <div className="brand-lockup">
           <img
-            src="/icons/icon-192.png"
+            src="/icons/icon-wallet-redesign-128.png"
             alt=""
             width={44}
             height={44}
             className="brand-icon"
           />
           <div>
-            <strong>Kaikei</strong>
+            <div className="brand-title">
+              <strong>Kaikei</strong>
+              <span className="version-badge">V3.0</span>
+            </div>
             <span>Personal finance</span>
           </div>
         </div>
@@ -562,20 +579,32 @@ export default function Home() {
           selectedKeys={[view]}
           onClick={({ key }) => setView(key as ViewKey)}
           items={[
-            { key: 'overview', icon: <BarChartOutlined />, label: 'Overview' },
+            { key: 'overview', icon: <BarChartOutlined />, label: 'Home' },
+            { key: 'budgets', icon: <ProfileOutlined />, label: 'Budget' },
             {
               key: 'transactions',
               icon: <SwapOutlined />,
               label: 'Transactions',
             },
-            { key: 'budgets', icon: <ProfileOutlined />, label: 'Budgets' },
           ]}
         />
-        <div className="sidebar-note">
-          <WalletOutlined />
-          <div>
-            <Text strong>Demo workspace</Text>
-            <Text type="secondary">Synthetic data · saved on this device</Text>
+        <div className="sidebar-footer">
+          <div className="sidebar-tools">
+            <Text className="sidebar-history">Demo controls</Text>
+            <Button
+              className="reset-demo-button"
+              icon={<ReloadOutlined />}
+              onClick={resetDemo}
+            >
+              Reset demo
+            </Button>
+          </div>
+          <div className="sidebar-note">
+            <WalletOutlined />
+            <div>
+              <Text strong>Demo workspace</Text>
+              <Text>Synthetic data · saved on this device</Text>
+            </div>
           </div>
         </div>
       </Sider>
@@ -583,27 +612,41 @@ export default function Home() {
       <Layout>
         <header className="topbar">
           <button className="mobile-brand" onClick={() => setView('overview')}>
-            <img src="/icons/icon-192.png" alt="" width={36} height={36} />
+            <img
+              src="/icons/icon-wallet-redesign-128.png"
+              alt=""
+              width={36}
+              height={36}
+            />
             <strong>Kaikei</strong>
+            <span className="version-badge">V3.0</span>
           </button>
           <div className="topbar-copy">
             <Text type="secondary">Your money, in one calm place</Text>
-            <Tag color="orange">Demo</Tag>
+            <Tag className="demo-badge">Demo</Tag>
           </div>
           <Space>
-            <Button className="reset-demo-button" onClick={resetDemo}>
-              Reset demo
-            </Button>
+            <Tooltip
+              title={mode === 'dark' ? 'Use light theme' : 'Use dark theme'}
+            >
+              <Button
+                className="theme-toggle"
+                type="text"
+                aria-label={
+                  mode === 'dark' ? 'Use light theme' : 'Use dark theme'
+                }
+                icon={mode === 'dark' ? <SunOutlined /> : <MoonOutlined />}
+                onClick={toggleTheme}
+              />
+            </Tooltip>
             <Select
               className="month-select"
               value={selectedPeriod}
               onChange={setSelectedPeriod}
-              options={[...periods]
-                .reverse()
-                .map((period) => ({
-                  label: monthLabel(period),
-                  value: period,
-                }))}
+              options={[...periods].reverse().map((period) => ({
+                label: monthLabel(period),
+                value: period,
+              }))}
             />
             <Button
               type="primary"
@@ -624,9 +667,7 @@ export default function Home() {
                     {monthLabel(selectedPeriod).toUpperCase()}
                   </Text>
                   <Title level={1}>{greeting()}</Title>
-                  <Text type="secondary">
-                    Here’s how your month is taking shape.
-                  </Text>
+                  <Text type="secondary">Let’s make it count.</Text>
                 </div>
                 <Button onClick={() => setView('transactions')}>
                   See all activity
@@ -672,7 +713,7 @@ export default function Home() {
                   <Progress
                     percent={Math.min(incomePercent, 100)}
                     showInfo={false}
-                    strokeColor="#102542"
+                    strokeColor={mode === 'dark' ? '#75a9db' : '#102542'}
                   />
                 </Card>
               </section>
@@ -680,14 +721,36 @@ export default function Home() {
               <section className="dashboard-grid">
                 <Card
                   title="Money flow"
-                  extra={<Text type="secondary">Income vs spending</Text>}
+                  extra={
+                    <div className="money-flow-controls">
+                      <Text type="secondary">Income vs spending</Text>
+                      <Segmented
+                        size="small"
+                        aria-label="Money flow period"
+                        value={flowMode}
+                        onChange={(value) =>
+                          setFlowMode(value as 'year' | 'month')
+                        }
+                        options={[
+                          { label: 'Year', value: 'year' },
+                          { label: 'Month', value: 'month' },
+                        ]}
+                      />
+                    </div>
+                  }
                 >
                   <div
                     className="chart-wrap"
                     aria-label="Monthly income and expense chart"
                   >
-                    <div className="flow-grid" aria-hidden="true">
-                      {flowData.map((item) => (
+                    <div
+                      className={`flow-grid ${flowMode}`}
+                      style={{
+                        gridTemplateColumns: `repeat(${visibleFlowData.length}, minmax(44px, 1fr))`,
+                      }}
+                      aria-hidden="true"
+                    >
+                      {visibleFlowData.map((item) => (
                         <div className="flow-month" key={item.period}>
                           <div className="flow-bars">
                             <Tooltip
@@ -949,7 +1012,14 @@ export default function Home() {
             onClick={() => setView('overview')}
           >
             <BarChartOutlined />
-            <span>Overview</span>
+            <span>Home</span>
+          </button>
+          <button
+            className={view === 'budgets' ? 'active' : ''}
+            onClick={() => setView('budgets')}
+          >
+            <ProfileOutlined />
+            <span>Budget</span>
           </button>
           <button
             className={view === 'transactions' ? 'active' : ''}
@@ -957,13 +1027,6 @@ export default function Home() {
           >
             <SwapOutlined />
             <span>Transactions</span>
-          </button>
-          <button
-            className={view === 'budgets' ? 'active' : ''}
-            onClick={() => setView('budgets')}
-          >
-            <ProfileOutlined />
-            <span>Budgets</span>
           </button>
         </nav>
       </Layout>

@@ -1,21 +1,31 @@
-# Kaikei Demo
+<p align="center">
+  <img src="docs/kaikei-demo-v3-banner.png" alt="Kaikei V3.0 — Personal finance, made clear" width="100%" />
+</p>
 
-Kaikei Demo is a safe, standalone version of the Kaikei personal-expense tracker. It lets people explore income, expense, transaction, and budget workflows using fictional 2026 finances—without connecting to the private production ledger or Google Sheet.
+# Kaikei Demo V3.0
+
+Kaikei Demo is a safe, standalone showcase of the redesigned Kaikei personal-expense tracker. It lets people explore the V3.0 dashboard, transaction, and budget workflows using fictional 2026 finances—without connecting to the private production ledger or Google Sheet.
 
 [Open the hosted demo](https://kaikei-demo-2026.ktanzyl.chatgpt.site)
 
 > **Demo safety:** every included record is synthetic. Changes are saved only in the current browser using `localStorage` and never sync to the production app, Google Sheets, or another visitor.
 
-## Screenshot
+## V3.0 redesign
 
-<p align="center">
-  <img src="docs/kaikei-demo-dashboard.jpg" alt="Kaikei Demo mobile dashboard showing fictional September finances" width="360" />
-</p>
+This release brings the public demo in line with the current Kaikei experience:
+
+- A dark navy desktop sidebar and compact mobile navigation.
+- The new navy wallet app icon across the interface, favicons, PWA assets, and iOS home-screen sizes.
+- A consistent orange action system with accessible navy text.
+- Uniform card and control corners, clearer number hierarchy, and roomier responsive layouts.
+- Light and dark themes saved on the current device.
+- Year and selected-month money-flow views.
+- Updated V3.0 metadata and installable-app manifest.
 
 ## What you can try
 
 - Review the current balance, monthly spending, monthly income, and net cash flow.
-- Compare income and expenses across the available 2026 months.
+- Compare income and expenses across the available 2026 months or focus on the selected month.
 - Browse recent activity and category budget progress.
 - Add new income or expense transactions.
 - Edit and delete transactions.
@@ -24,7 +34,8 @@ Kaikei Demo is a safe, standalone version of the Kaikei personal-expense tracker
 - Edit planned amounts for individual budget categories.
 - Switch between expense and income budgets.
 - Reset the entire demo to its original sample data at any time.
-- Install the responsive interface on an iPhone or iPad home screen.
+- Switch between light and dark themes.
+- Install the responsive interface from Safari or Chrome with the dedicated wallet icon.
 
 ## Demo data and persistence
 
@@ -57,13 +68,14 @@ The two apps have separate source histories, deployments, and storage behavior. 
 
 ## Design
 
-Kaikei uses Ant Design as its interface foundation, extended with a custom orange-and-navy visual system:
+Kaikei V3.0 uses Ant Design as its interface foundation, extended with a custom orange-and-navy visual system:
 
 - Navy `#102542` for primary surfaces, typography, and income indicators.
 - Orange `#F26A21` for actions, expenses, and emphasis.
-- Responsive desktop sidebar and mobile bottom navigation.
+- A dark navy desktop workspace and translucent mobile bottom navigation.
 - Touch-friendly transaction and budget forms.
-- A yen-symbol app icon sized for favicons, PWA installation, and the iOS home screen.
+- A wallet app icon sized for favicons, PWA installation, and iOS home screens.
+- Consistent rounded surfaces, typography, spacing, contrast, and focus states.
 
 ## Technology
 
@@ -93,8 +105,9 @@ lib/
 public/
   icons/               App and iOS home-screen icons
   manifest.webmanifest Installable-app manifest
-  og.png               Social preview image
+  og.png               Existing social preview image
 docs/
+  kaikei-demo-v3-banner.png
   kaikei-demo-dashboard.jpg
 ```
 
