@@ -569,7 +569,7 @@ export default function Home() {
           <div>
             <div className="brand-title">
               <strong>Kaikei</strong>
-              <span className="version-badge">V3.0</span>
+              <span className="version-badge">V3.1</span>
             </div>
             <span>Personal finance</span>
           </div>
@@ -619,7 +619,7 @@ export default function Home() {
               height={36}
             />
             <strong>Kaikei</strong>
-            <span className="version-badge">V3.0</span>
+            <span className="version-badge">V3.1</span>
           </button>
           <div className="topbar-copy">
             <Text type="secondary">Your money, in one calm place</Text>

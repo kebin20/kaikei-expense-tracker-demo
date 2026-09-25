@@ -1,18 +1,18 @@
 <p align="center">
-  <img src="docs/kaikei-demo-v3-banner.png" alt="Kaikei V3.0 — Personal finance, made clear" width="100%" />
+  <img src="docs/kaikei-demo-v3-banner.png" alt="Kaikei V3.1 — Personal finance, made clear" width="100%" />
 </p>
 
-# Kaikei Demo V3.0
+# Kaikei Demo V3.1
 
-Kaikei Demo is a safe, standalone showcase of the redesigned Kaikei personal-expense tracker. It lets people explore the V3.0 dashboard, transaction, and budget workflows using fictional 2026 finances—without connecting to the private production ledger or Google Sheet.
+Kaikei Demo is a safe, standalone showcase of the redesigned Kaikei personal-expense tracker. It lets people explore the V3.1 dashboard, transaction, and budget workflows using fictional 2026 finances—without connecting to the private production ledger or Google Sheet.
 
 [Open the hosted demo](https://kaikei-demo-2026.ktanzyl.chatgpt.site)
 
 > **Demo safety:** every included record is synthetic. Changes are saved only in the current browser using `localStorage` and never sync to the production app, Google Sheets, or another visitor.
 
-## V3.0 redesign
+## V3.1 release
 
-This release brings the public demo in line with the current Kaikei experience:
+V3.1 keeps the public demo aligned with the current Kaikei experience while preserving its isolated, browser-only data model:
 
 - A dark navy desktop sidebar and compact mobile navigation.
 - The new navy wallet app icon across the interface, favicons, PWA assets, and iOS home-screen sizes.
@@ -20,7 +20,8 @@ This release brings the public demo in line with the current Kaikei experience:
 - Uniform card and control corners, clearer number hierarchy, and roomier responsive layouts.
 - Light and dark themes saved on the current device.
 - Year and selected-month money-flow views.
-- Updated V3.0 metadata and installable-app manifest.
+- Updated V3.1 interface labels, metadata, installable-app manifest, and repository banner.
+- Immediate rendering from bundled synthetic data with transaction and budget editors loaded only when needed.
 
 ## What you can try
 
@@ -68,7 +69,7 @@ The two apps have separate source histories, deployments, and storage behavior. 
 
 ## Design
 
-Kaikei V3.0 uses Ant Design as its interface foundation, extended with a custom orange-and-navy visual system:
+Kaikei V3.1 uses Ant Design as its interface foundation, extended with a custom orange-and-navy visual system:
 
 - Navy `#102542` for primary surfaces, typography, and income indicators.
 - Orange `#F26A21` for actions, expenses, and emphasis.
