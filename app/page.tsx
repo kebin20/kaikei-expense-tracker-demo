@@ -141,7 +141,7 @@ export default function Home() {
   const [editingBudget, setEditingBudget] = useState<BudgetPlan | null>(null);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [savingBudget, setSavingBudget] = useState(false);
-  const [flowMode, setFlowMode] = useState<'year' | 'month'>('year');
+  const [flowMode, setFlowMode] = useState<'year' | 'month'>('month');
 
   const loadLedger = () => {
     setError('');
