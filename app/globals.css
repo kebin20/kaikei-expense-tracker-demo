@@ -41,6 +41,8 @@ html {
   min-height: 100%;
   background: var(--paper);
   color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 html[data-theme='dark'] {
@@ -147,6 +149,9 @@ input:focus-visible,
 
 .app-shell {
   min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  overflow-x: clip;
   background: var(--paper);
 }
 
@@ -319,6 +324,7 @@ input:focus-visible,
   display: none;
   align-items: center;
   gap: 9px;
+  min-height: 44px;
   padding: 0;
   border: 0;
   background: none;
@@ -856,6 +862,8 @@ html[data-theme='dark'] .chart-legend .income-dot {
   display: grid;
   width: min(720px, calc(100% - 36px));
   min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
   margin: 0 auto;
   place-content: center;
 }
@@ -890,7 +898,8 @@ html[data-theme='dark'] .chart-legend .income-dot {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 760px),
+  (orientation: landscape) and (max-width: 960px) and (pointer: coarse) {
   .desktop-sider {
     display: none;
   }
@@ -901,8 +910,10 @@ html[data-theme='dark'] .chart-legend .income-dot {
   }
 
   .topbar {
-    min-height: 78px;
-    padding: 12px 20px;
+    min-height: calc(68px + env(safe-area-inset-top));
+    padding: calc(12px + env(safe-area-inset-top))
+      calc(20px + env(safe-area-inset-right)) 12px
+      calc(20px + env(safe-area-inset-left));
     background: color-mix(in srgb, var(--surface) 94%, transparent);
   }
 
@@ -919,7 +930,35 @@ html[data-theme='dark'] .chart-legend .income-dot {
   }
 
   .topbar .ant-btn {
+    min-width: 44px;
+    min-height: 44px;
     padding-inline: 13px;
+  }
+
+  .ant-modal-close {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-input-number,
+  .ant-picker,
+  .ant-select .ant-select-selector {
+    min-height: 44px !important;
+  }
+
+  .ant-input-number-input {
+    min-height: 42px;
+  }
+
+  .ant-select .ant-select-selector {
+    align-items: center;
+  }
+
+  .ant-segmented-item-label {
+    min-height: 38px;
+    line-height: 38px;
   }
 
   .add-button-label,
@@ -928,7 +967,9 @@ html[data-theme='dark'] .chart-legend .income-dot {
   }
 
   .content-wrap {
-    padding: 28px 20px 112px;
+    padding: 28px calc(20px + env(safe-area-inset-right))
+      calc(112px + env(safe-area-inset-bottom))
+      calc(20px + env(safe-area-inset-left));
   }
 
   .page-heading {
@@ -1032,6 +1073,7 @@ html[data-theme='dark'] .chart-legend .income-dot {
     grid-template-columns: 42px minmax(0, 1fr) auto;
     align-items: center;
     gap: 10px;
+    min-height: 52px;
     padding: 14px 0;
     border: 0;
     border-bottom: 1px solid var(--border-soft);
@@ -1052,7 +1094,7 @@ html[data-theme='dark'] .chart-legend .income-dot {
   }
 
   .mobile-transaction > .ant-typography:last-child {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .budget-summary-strip {
@@ -1077,9 +1119,9 @@ html[data-theme='dark'] .chart-legend .income-dot {
   .mobile-nav {
     position: fixed;
     z-index: 30;
-    right: 14px;
+    right: calc(14px + env(safe-area-inset-right));
     bottom: max(12px, env(safe-area-inset-bottom));
-    left: 14px;
+    left: calc(14px + env(safe-area-inset-left));
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     padding: 8px;
@@ -1095,6 +1137,7 @@ html[data-theme='dark'] .chart-legend .income-dot {
     flex-direction: column;
     align-items: center;
     gap: 5px;
+    min-height: 52px;
     padding: 7px 4px;
     border: 0;
     border-radius: 14px;
@@ -1104,7 +1147,7 @@ html[data-theme='dark'] .chart-legend .income-dot {
   }
 
   .mobile-nav button span {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 650;
   }
 
@@ -1147,6 +1190,12 @@ html[data-theme='dark'] .chart-legend .income-dot {
   .form-grid {
     grid-template-columns: 1fr;
     gap: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-brand .version-badge {
+    display: none;
   }
 }
 

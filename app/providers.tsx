@@ -70,7 +70,7 @@ export default function Providers({ children }: { children: ReactNode }) {
             : '0 14px 36px rgba(16, 37, 66, 0.08)',
       },
       components: {
-        Button: { controlHeight: 42, fontWeight: 680 },
+        Button: { controlHeight: 44, fontWeight: 680 },
         Card: { headerFontSize: 16 },
         Menu: { itemBorderRadius: 13, itemHeight: 46 },
         Segmented: { itemSelectedBg: mode === 'dark' ? '#1d3653' : '#ffffff' },
