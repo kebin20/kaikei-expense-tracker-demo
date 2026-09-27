@@ -51,20 +51,6 @@ const { Text, Title } = Typography;
 type ViewKey = 'overview' | 'transactions' | 'budgets';
 
 const DEMO_STORAGE_KEY = 'kaikei-demo-ledger-v1';
-const JAPANESE_MONTH_MARKS = [
-  '一月',
-  '二月',
-  '三月',
-  '四月',
-  '五月',
-  '六月',
-  '七月',
-  '八月',
-  '九月',
-  '十月',
-  '十一月',
-  '十二月',
-];
 
 const currency = new Intl.NumberFormat('ja-JP', {
   style: 'currency',
@@ -82,46 +68,6 @@ function monthLabel(period: string) {
 
 function compactMonth(period: string) {
   return dayjs(`${period}-01`).format('MMM');
-}
-
-function seasonalLedgerMeta(period: string) {
-  const month = Math.min(12, Math.max(1, Number(period.slice(5, 7)) || 1));
-  if (month >= 3 && month <= 5)
-    return {
-      season: 'spring',
-      monthMark: JAPANESE_MONTH_MARKS[month - 1],
-      seasonMark: '春',
-    };
-  if (month >= 6 && month <= 8)
-    return {
-      season: 'summer',
-      monthMark: JAPANESE_MONTH_MARKS[month - 1],
-      seasonMark: '夏',
-    };
-  if (month >= 9 && month <= 11)
-    return {
-      season: 'autumn',
-      monthMark: JAPANESE_MONTH_MARKS[month - 1],
-      seasonMark: '秋',
-    };
-  return {
-    season: 'winter',
-    monthMark: JAPANESE_MONTH_MARKS[month - 1],
-    seasonMark: '冬',
-  };
-}
-
-function greeting() {
-  const hour = Number(
-    new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Tokyo',
-    }).format(new Date()),
-  );
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
 }
 
 function freshDemoLedger(): LedgerData {
@@ -581,7 +527,6 @@ export default function Home() {
   }
 
   const cashFlow = monthIncome - monthExpense;
-  const seasonalLedger = seasonalLedgerMeta(selectedPeriod);
   const spendPercent = plannedExpense
     ? Math.round((monthExpense / plannedExpense) * 100)
     : 0;
@@ -703,27 +648,6 @@ export default function Home() {
         <Content className="content-wrap">
           {view === 'overview' && (
             <>
-              <section
-                className={`page-heading seasonal-heading season-${seasonalLedger.season}`}
-              >
-                <div className="seasonal-heading-copy">
-                  <Text className="eyebrow">
-                    {monthLabel(selectedPeriod).toUpperCase()}
-                  </Text>
-                  <Title level={1}>{greeting()}</Title>
-                  <Text type="secondary" className="seasonal-motto">
-                    A calmer today, a richer tomorrow.
-                  </Text>
-                </div>
-                <div className="seasonal-month-sign" aria-hidden="true">
-                  <span>{seasonalLedger.monthMark}</span>
-                  <b>{seasonalLedger.seasonMark}</b>
-                </div>
-                <Button onClick={() => setView('transactions')}>
-                  See all activity
-                </Button>
-              </section>
-
               <section className="metric-grid">
                 <Card
                   className="balance-card seasonal-balance-card"
@@ -737,7 +661,6 @@ export default function Home() {
                     {cashFlow >= 0 ? '↑' : '↓'}{' '}
                     {formatMoney(Math.abs(cashFlow))} this month
                   </Tag>
-                  <div className="balance-orbit" aria-hidden="true" />
                 </Card>
                 <Card className="metric-card seasonal-metric-card expense-metric">
                   <div className="metric-icon expense">
