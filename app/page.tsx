@@ -18,6 +18,7 @@ import {
   App,
   Button,
   Card,
+  Drawer,
   Empty,
   Layout,
   Menu,
@@ -129,6 +130,7 @@ export default function Home() {
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [savingBudget, setSavingBudget] = useState(false);
   const [flowMode, setFlowMode] = useState<'year' | 'month'>('month');
+  const [biggestPurchasesOpen, setBiggestPurchasesOpen] = useState(false);
 
   const loadLedger = () => {
     setError('');
@@ -273,6 +275,25 @@ export default function Home() {
       monthTransactions
         .filter((item) => item.type === 'income')
         .reduce((sum, item) => sum + item.amount, 0),
+    [monthTransactions],
+  );
+
+  const biggestPurchases = useMemo(
+    () =>
+      monthTransactions
+        .filter(
+          (item) =>
+            item.type === 'expense' &&
+            item.amount > 0 &&
+            item.source !== 'google-sheet-summary',
+        )
+        .sort(
+          (a, b) =>
+            b.amount - a.amount ||
+            b.transactionDate.localeCompare(a.transactionDate) ||
+            b.createdAt - a.createdAt,
+        )
+        .slice(0, 5),
     [monthTransactions],
   );
 
@@ -696,7 +717,7 @@ export default function Home() {
 
               <section className="dashboard-grid">
                 <Card
-                  className="seasonal-card seasonal-flow-card"
+                  className="money-flow-card seasonal-card seasonal-flow-card"
                   title="Money flow"
                   extra={
                     <div className="money-flow-controls">
@@ -762,6 +783,38 @@ export default function Home() {
                     <span className="expense-dot" />
                     Expense
                   </div>
+                  <section className="biggest-purchases-callout">
+                    <div className="biggest-purchases-preview">
+                      <Text type="secondary">Biggest purchase this month</Text>
+                      {biggestPurchases[0] ? (
+                        <>
+                          <strong>{biggestPurchases[0].description}</strong>
+                          <Text type="secondary">
+                            {dayjs(biggestPurchases[0].transactionDate).format(
+                              'MMM D',
+                            )}{' '}
+                            · {biggestPurchases[0].category}
+                          </Text>
+                        </>
+                      ) : (
+                        <strong>No purchases recorded</strong>
+                      )}
+                    </div>
+                    <div className="biggest-purchases-action">
+                      {biggestPurchases[0] && (
+                        <strong>
+                          −{formatMoney(biggestPurchases[0].amount)}
+                        </strong>
+                      )}
+                      <Button
+                        icon={<BarChartOutlined />}
+                        disabled={!biggestPurchases.length}
+                        onClick={() => setBiggestPurchasesOpen(true)}
+                      >
+                        View top 5
+                      </Button>
+                    </div>
+                  </section>
                 </Card>
                 <Card
                   className="seasonal-card seasonal-activity-card"
@@ -1008,6 +1061,52 @@ export default function Home() {
           </button>
         </nav>
       </Layout>
+
+      <Drawer
+        title={`Top purchases · ${monthLabel(selectedPeriod)}`}
+        open={biggestPurchasesOpen}
+        onClose={() => setBiggestPurchasesOpen(false)}
+        size="min(420px, 100vw)"
+      >
+        <div className="biggest-purchases-drawer-intro">
+          <Text type="secondary">
+            The five highest individual expense transactions recorded this
+            month.
+          </Text>
+          {biggestPurchases.length > 0 && (
+            <Text strong>
+              {formatMoney(
+                biggestPurchases.reduce((sum, item) => sum + item.amount, 0),
+              )}{' '}
+              combined
+            </Text>
+          )}
+        </div>
+        {biggestPurchases.length ? (
+          <div className="biggest-purchases-list">
+            {biggestPurchases.map((item, index) => (
+              <article key={item.id}>
+                <span className="purchase-rank" aria-label={`Rank ${index + 1}`}>
+                  {index + 1}
+                </span>
+                <div className="purchase-copy">
+                  <Text strong>{item.description}</Text>
+                  <Text type="secondary">
+                    {dayjs(item.transactionDate).format('MMM D')} ·{' '}
+                    {item.category}
+                  </Text>
+                </div>
+                <Text strong>−{formatMoney(item.amount)}</Text>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No purchases this month"
+          />
+        )}
+      </Drawer>
 
       {transactionOpen && (
         <Suspense fallback={null}>
