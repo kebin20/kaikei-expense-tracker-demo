@@ -20,6 +20,249 @@
   --shadow-strong: 0 18px 48px rgba(16, 37, 66, 0.14);
 }
 
+/* Seasonal Ledger: a lightweight washi surface and moonlit monthly scene. */
+.seasonal-ledger-theme {
+  --seasonal-card: rgba(255, 253, 249, 0.94);
+  --seasonal-fiber: rgba(62, 82, 105, 0.045);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 12% 18%, var(--seasonal-fiber) 0 0.7px, transparent 0.9px),
+    radial-gradient(circle at 72% 42%, var(--seasonal-fiber) 0 0.55px, transparent 0.8px),
+    linear-gradient(112deg, transparent 0 48%, rgba(255, 255, 255, 0.22) 49% 50%, transparent 51%);
+  background-size: 19px 17px, 23px 21px, 160px 160px;
+}
+
+html[data-theme='dark'] .seasonal-ledger-theme {
+  --seasonal-card: rgba(18, 31, 49, 0.94);
+  --seasonal-fiber: rgba(210, 224, 238, 0.035);
+}
+
+.seasonal-heading {
+  position: relative;
+  min-height: 178px;
+  overflow: hidden;
+  align-items: flex-end;
+  padding: 28px 30px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, #e8c88e);
+  border-radius: 22px;
+  background:
+    linear-gradient(90deg, var(--surface) 0 30%, color-mix(in srgb, var(--surface) 88%, transparent) 43%, transparent 68%),
+    url('/illustrations/seasonal-ledger-night.svg') right center / cover no-repeat,
+    var(--surface);
+  box-shadow: 0 10px 32px rgba(16, 37, 66, 0.08);
+}
+
+.seasonal-heading::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(16, 37, 66, 0.045) 0 0.7px, transparent 0.9px),
+    radial-gradient(circle at 42% 68%, rgba(242, 106, 33, 0.04) 0 0.6px, transparent 0.85px);
+  background-size: 18px 17px, 23px 21px;
+  content: '';
+  mix-blend-mode: multiply;
+}
+
+.seasonal-heading-copy {
+  position: relative;
+  z-index: 2;
+  width: min(54%, 540px);
+}
+
+.seasonal-heading .eyebrow {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.seasonal-heading h1 {
+  margin-block: 2px 7px !important;
+}
+
+.seasonal-motto {
+  display: block;
+  max-width: 260px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  line-height: 1.45;
+  letter-spacing: 0.015em;
+}
+
+.seasonal-month-sign {
+  position: absolute;
+  z-index: 2;
+  top: 24px;
+  right: 28px;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 10px rgba(7, 29, 52, 0.35);
+}
+
+.seasonal-month-sign span {
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  writing-mode: vertical-rl;
+}
+
+.seasonal-month-sign b {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 8px 5px 7px 4px;
+  color: #102542;
+  background: #f47a3a;
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(7, 29, 52, 0.22);
+  transform: rotate(-2deg);
+}
+
+.seasonal-heading > .ant-btn {
+  position: absolute;
+  z-index: 3;
+  right: 27px;
+  bottom: 24px;
+  border-color: rgba(255, 255, 255, 0.42);
+  color: #fff;
+  background: rgba(7, 29, 52, 0.38);
+  backdrop-filter: blur(8px);
+}
+
+.seasonal-ledger-theme .seasonal-card,
+.seasonal-ledger-theme .seasonal-metric-card {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--seasonal-card) !important;
+}
+
+.seasonal-card > *,
+.seasonal-metric-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.seasonal-flow-card::after,
+.income-metric::after {
+  position: absolute;
+  z-index: 0;
+  top: 70px;
+  right: -28px;
+  width: 190px;
+  height: 78px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 28% 64%, rgba(111, 155, 199, 0.11) 0 19%, transparent 20%),
+    radial-gradient(ellipse at 50% 48%, rgba(111, 155, 199, 0.11) 0 25%, transparent 26%),
+    radial-gradient(ellipse at 73% 68%, rgba(111, 155, 199, 0.11) 0 21%, transparent 22%);
+  content: '';
+}
+
+.seasonal-activity-card::after {
+  position: absolute;
+  z-index: 0;
+  bottom: -26px;
+  left: -42px;
+  width: 210px;
+  height: 180px;
+  pointer-events: none;
+  background: repeating-linear-gradient(73deg, transparent 0 13px, rgba(180, 142, 83, 0.13) 14px 16px, transparent 17px 25px);
+  clip-path: polygon(0 28%, 100% 0, 72% 100%, 0 100%);
+  content: '';
+  transform: rotate(-7deg);
+}
+
+.seasonal-ledger-theme .seasonal-balance-card {
+  background:
+    linear-gradient(90deg, rgba(7, 29, 52, 0.98) 0 38%, rgba(10, 39, 71, 0.72) 68%, rgba(10, 39, 71, 0.18) 100%),
+    url('/illustrations/seasonal-ledger-night.svg') center / cover no-repeat,
+    #102542 !important;
+}
+
+.seasonal-balance-card .ant-card-body {
+  position: relative;
+  z-index: 1;
+}
+
+.seasonal-metric-card .metric-icon {
+  border: 1px dashed color-mix(in srgb, currentColor 34%, transparent);
+  border-radius: 11px 7px 10px 6px;
+  box-shadow: 0 4px 12px rgba(16, 37, 66, 0.07);
+  transform: rotate(-1.5deg);
+}
+
+.expense-metric::after {
+  position: absolute;
+  z-index: 0;
+  right: 62px;
+  bottom: 8px;
+  width: 92px;
+  height: 72px;
+  pointer-events: none;
+  border-radius: 48% 52% 42% 58%;
+  background:
+    radial-gradient(circle at 62% 44%, rgba(242, 106, 33, 0.12) 0 10%, transparent 11%),
+    radial-gradient(circle at 48% 52%, rgba(242, 106, 33, 0.08) 0 31%, transparent 32%);
+  content: '';
+  transform: rotate(-8deg);
+}
+
+@media (max-width: 760px),
+  (orientation: landscape) and (max-width: 960px) and (pointer: coarse) {
+  .seasonal-heading {
+    min-height: 184px;
+    align-items: flex-end;
+    margin: -6px 0 8px;
+    padding: 24px 22px;
+    background:
+      linear-gradient(90deg, var(--surface) 0 24%, color-mix(in srgb, var(--surface) 88%, transparent) 43%, transparent 72%),
+      url('/illustrations/seasonal-ledger-night.svg') 60% center / auto 100% no-repeat,
+      var(--surface);
+  }
+
+  .seasonal-heading-copy {
+    width: min(72%, 360px);
+  }
+
+  .seasonal-heading h1 {
+    max-width: 260px;
+    font-size: clamp(26px, 7.2vw, 31px) !important;
+  }
+
+  .seasonal-motto {
+    max-width: 190px;
+    font-size: 13px;
+  }
+
+  .seasonal-month-sign {
+    top: 22px;
+    right: 18px;
+  }
+
+  .seasonal-heading > .ant-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .seasonal-heading-copy {
+    width: 78%;
+  }
+
+  .seasonal-heading h1 {
+    font-size: 25px !important;
+  }
+
+  .seasonal-motto {
+    max-width: 176px;
+  }
+}
+
 html[data-theme='dark'] {
   --paper: #071627;
   --surface: #0f2238;

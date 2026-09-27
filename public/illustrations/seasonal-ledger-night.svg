@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-label="Moonlit mountains and autumn grass">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#153758" stop-opacity="0"/>
+      <stop offset=".27" stop-color="#153758" stop-opacity=".82"/>
+      <stop offset="1" stop-color="#0b2948"/>
+    </linearGradient>
+    <linearGradient id="moon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff5d5"/>
+      <stop offset="1" stop-color="#efd9a9"/>
+    </linearGradient>
+    <linearGradient id="mountain" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#284f73"/>
+      <stop offset="1" stop-color="#102f4e"/>
+    </linearGradient>
+    <pattern id="grain" width="19" height="19" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="4" r=".7" fill="#fff" opacity=".12"/>
+      <circle cx="14" cy="11" r=".55" fill="#fff" opacity=".08"/>
+      <path d="M1 16l7-1M11 3l6-1" stroke="#fff" stroke-width=".45" opacity=".08"/>
+    </pattern>
+  </defs>
+  <path d="M18 51C145 22 228 43 320 29c89-14 153-39 246-23 76 13 151 4 244 17 119 17 256-4 372 41v272H78c-35-45-51-91-27-131 17-28-65-51-51-91 10-29-14-45 18-63z" fill="url(#sky)"/>
+  <circle cx="880" cy="92" r="62" fill="url(#moon)"/>
+  <circle cx="860" cy="71" r="5" fill="#e5cf9c" opacity=".44"/>
+  <circle cx="906" cy="105" r="8" fill="#e5cf9c" opacity=".28"/>
+  <path d="M274 247l123-108 83 57 92-94 112 112 78-62 98 95 76-47 117 92H215z" fill="#4f6e8c" opacity=".58"/>
+  <path d="M194 279l134-96 83 66 119-107 112 114 91-75 126 97 98-62 130 93H136z" fill="url(#mountain)"/>
+  <path d="M109 306c160-43 282-9 401-25 142-20 230-3 347 1 129 5 212-21 343 25v53H77z" fill="#071d34"/>
+  <g fill="#f4cf87" opacity=".92">
+    <rect x="541" y="286" width="7" height="7" rx="1"/>
+    <rect x="572" y="278" width="6" height="7" rx="1"/>
+    <rect x="608" y="292" width="8" height="6" rx="1"/>
+    <rect x="658" y="281" width="6" height="7" rx="1"/>
+    <rect x="702" y="292" width="7" height="6" rx="1"/>
+  </g>
+  <g fill="none" stroke="#e8c88e" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1016 357c-8-83 6-152 40-229M1041 350c11-89 46-152 91-205M1091 360c-2-73 17-132 64-187" stroke-width="4"/>
+    <path d="M1057 134c-36 5-55 20-71 39M1059 148c34 0 58 10 81 27M1074 177c-33 5-56 19-76 40M1080 191c31 1 55 12 77 30M1131 151c-28 2-48 13-66 30M1136 165c29 4 48 16 65 33M1156 183c-29 5-48 16-64 35M1159 197c21 3 32 10 41 20" stroke-width="3"/>
+  </g>
+  <g fill="none" stroke="#9bb2c6" stroke-linecap="round" opacity=".48">
+    <path d="M503 88c33-19 75-19 105 0 23-16 59-16 83 1" stroke-width="5"/>
+    <path d="M735 55c19-11 45-10 64 1 18-10 40-9 55 2" stroke-width="4"/>
+  </g>
+  <path d="M18 51C145 22 228 43 320 29c89-14 153-39 246-23 76 13 151 4 244 17 119 17 256-4 372 41v272H78c-35-45-51-91-27-131 17-28-65-51-51-91 10-29-14-45 18-63z" fill="url(#grain)"/>
+</svg>

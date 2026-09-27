@@ -51,6 +51,20 @@ const { Text, Title } = Typography;
 type ViewKey = 'overview' | 'transactions' | 'budgets';
 
 const DEMO_STORAGE_KEY = 'kaikei-demo-ledger-v1';
+const JAPANESE_MONTH_MARKS = [
+  '一月',
+  '二月',
+  '三月',
+  '四月',
+  '五月',
+  '六月',
+  '七月',
+  '八月',
+  '九月',
+  '十月',
+  '十一月',
+  '十二月',
+];
 
 const currency = new Intl.NumberFormat('ja-JP', {
   style: 'currency',
@@ -68,6 +82,33 @@ function monthLabel(period: string) {
 
 function compactMonth(period: string) {
   return dayjs(`${period}-01`).format('MMM');
+}
+
+function seasonalLedgerMeta(period: string) {
+  const month = Math.min(12, Math.max(1, Number(period.slice(5, 7)) || 1));
+  if (month >= 3 && month <= 5)
+    return {
+      season: 'spring',
+      monthMark: JAPANESE_MONTH_MARKS[month - 1],
+      seasonMark: '春',
+    };
+  if (month >= 6 && month <= 8)
+    return {
+      season: 'summer',
+      monthMark: JAPANESE_MONTH_MARKS[month - 1],
+      seasonMark: '夏',
+    };
+  if (month >= 9 && month <= 11)
+    return {
+      season: 'autumn',
+      monthMark: JAPANESE_MONTH_MARKS[month - 1],
+      seasonMark: '秋',
+    };
+  return {
+    season: 'winter',
+    monthMark: JAPANESE_MONTH_MARKS[month - 1],
+    seasonMark: '冬',
+  };
 }
 
 function greeting() {
@@ -540,6 +581,7 @@ export default function Home() {
   }
 
   const cashFlow = monthIncome - monthExpense;
+  const seasonalLedger = seasonalLedgerMeta(selectedPeriod);
   const spendPercent = plannedExpense
     ? Math.round((monthExpense / plannedExpense) * 100)
     : 0;
@@ -556,7 +598,7 @@ export default function Home() {
   );
 
   return (
-    <Layout className="app-shell">
+    <Layout className="app-shell seasonal-ledger-theme">
       <Sider className="desktop-sider" width={216} theme="dark">
         <div className="brand-lockup">
           <img
@@ -569,7 +611,7 @@ export default function Home() {
           <div>
             <div className="brand-title">
               <strong>Kaikei</strong>
-              <span className="version-badge">V3.1</span>
+              <span className="version-badge">V3.2</span>
             </div>
             <span>Personal finance</span>
           </div>
@@ -619,7 +661,7 @@ export default function Home() {
               height={36}
             />
             <strong>Kaikei</strong>
-            <span className="version-badge">V3.1</span>
+            <span className="version-badge">V3.2</span>
           </button>
           <div className="topbar-copy">
             <Text type="secondary">Your money, in one calm place</Text>
@@ -661,13 +703,21 @@ export default function Home() {
         <Content className="content-wrap">
           {view === 'overview' && (
             <>
-              <section className="page-heading">
-                <div>
+              <section
+                className={`page-heading seasonal-heading season-${seasonalLedger.season}`}
+              >
+                <div className="seasonal-heading-copy">
                   <Text className="eyebrow">
                     {monthLabel(selectedPeriod).toUpperCase()}
                   </Text>
                   <Title level={1}>{greeting()}</Title>
-                  <Text type="secondary">Let’s make it count.</Text>
+                  <Text type="secondary" className="seasonal-motto">
+                    A calmer today, a richer tomorrow.
+                  </Text>
+                </div>
+                <div className="seasonal-month-sign" aria-hidden="true">
+                  <span>{seasonalLedger.monthMark}</span>
+                  <b>{seasonalLedger.seasonMark}</b>
                 </div>
                 <Button onClick={() => setView('transactions')}>
                   See all activity
@@ -675,7 +725,10 @@ export default function Home() {
               </section>
 
               <section className="metric-grid">
-                <Card className="balance-card" variant="borderless">
+                <Card
+                  className="balance-card seasonal-balance-card"
+                  variant="borderless"
+                >
                   <Text>Balance through {monthLabel(selectedPeriod)}</Text>
                   <div className="balance-value">
                     {formatMoney(currentBalance)}
@@ -686,7 +739,7 @@ export default function Home() {
                   </Tag>
                   <div className="balance-orbit" aria-hidden="true" />
                 </Card>
-                <Card className="metric-card">
+                <Card className="metric-card seasonal-metric-card expense-metric">
                   <div className="metric-icon expense">
                     <ArrowUpOutlined />
                   </div>
@@ -701,7 +754,7 @@ export default function Home() {
                     strokeColor="#f26a21"
                   />
                 </Card>
-                <Card className="metric-card">
+                <Card className="metric-card seasonal-metric-card income-metric">
                   <div className="metric-icon income">
                     <ArrowDownOutlined />
                   </div>
@@ -720,6 +773,7 @@ export default function Home() {
 
               <section className="dashboard-grid">
                 <Card
+                  className="seasonal-card seasonal-flow-card"
                   title="Money flow"
                   extra={
                     <div className="money-flow-controls">
@@ -787,6 +841,7 @@ export default function Home() {
                   </div>
                 </Card>
                 <Card
+                  className="seasonal-card seasonal-activity-card"
                   title="Recent activity"
                   extra={
                     <Button type="link" onClick={() => setView('transactions')}>
@@ -834,7 +889,7 @@ export default function Home() {
               </section>
 
               <Card
-                className="budget-pulse-card"
+                className="budget-pulse-card seasonal-card"
                 title="Budget pulse"
                 extra={
                   <Button type="link" onClick={() => setView('budgets')}>
