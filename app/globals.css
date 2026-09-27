@@ -900,6 +900,145 @@ html[data-theme='dark'] .chart-legend .income-dot {
 .transaction-toolbar .ant-input-affix-wrapper {
   max-width: 360px;
 }
+.desktop-all-ledger {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.transaction-ledger-column {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.transaction-ledger-heading {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-subtle);
+}
+.transaction-ledger-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+}
+.transaction-ledger-title > span:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+.transaction-ledger-title .ant-typography:first-child {
+  font-size: 16px;
+}
+.transaction-ledger-title .ant-typography-secondary {
+  font-size: 12px;
+}
+.transaction-ledger-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--orange-strong);
+  background: var(--orange-soft);
+}
+.transaction-ledger-column.income .transaction-ledger-icon {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 12%, var(--surface));
+}
+.transaction-ledger-heading > .ant-typography {
+  flex: 0 0 auto;
+  font-size: 18px;
+  white-space: nowrap;
+}
+.transaction-ledger-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.transaction-ledger-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 78px;
+  padding: 13px 14px 13px 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.transaction-ledger-row:nth-child(even) {
+  background: var(--surface-subtle);
+}
+.transaction-ledger-row:last-child {
+  border-bottom: 0;
+}
+.transaction-ledger-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.transaction-ledger-copy > .ant-typography {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.transaction-ledger-copy > .ant-typography:first-child {
+  font-size: 14px;
+}
+.transaction-ledger-copy > .ant-typography-secondary {
+  font-size: 11px;
+}
+.transaction-ledger-source {
+  color: var(--icon-muted) !important;
+}
+.transaction-ledger-value {
+  display: flex;
+  min-width: 102px;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+.transaction-ledger-value > .ant-typography {
+  font-size: 14px;
+  white-space: nowrap;
+}
+.transaction-ledger-actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.transaction-ledger-actions .ant-btn {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+}
+.transaction-ledger-empty {
+  display: grid;
+  min-height: 220px;
+  place-content: center;
+}
+.desktop-table.all-filter-table {
+  display: none;
+}
+
+@media (max-width: 1020px) {
+  .desktop-all-ledger {
+    display: none;
+  }
+  .desktop-table.all-filter-table {
+    display: block;
+  }
+}
 
 .transactions-card .ant-card-body {
   padding-bottom: 5px;
