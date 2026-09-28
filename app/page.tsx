@@ -2,17 +2,6 @@
 
 /* oxlint-disable next/no-img-element */
 
-import ArrowDownOutlined from '@ant-design/icons/ArrowDownOutlined';
-import ArrowUpOutlined from '@ant-design/icons/ArrowUpOutlined';
-import BarChartOutlined from '@ant-design/icons/BarChartOutlined';
-import EditOutlined from '@ant-design/icons/EditOutlined';
-import MoonOutlined from '@ant-design/icons/MoonOutlined';
-import PlusOutlined from '@ant-design/icons/PlusOutlined';
-import ProfileOutlined from '@ant-design/icons/ProfileOutlined';
-import ReloadOutlined from '@ant-design/icons/ReloadOutlined';
-import SunOutlined from '@ant-design/icons/SunOutlined';
-import SwapOutlined from '@ant-design/icons/SwapOutlined';
-import WalletOutlined from '@ant-design/icons/WalletOutlined';
 import {
   Alert,
   App,
@@ -25,7 +14,6 @@ import {
   Progress,
   Segmented,
   Select,
-  Space,
   Tag,
   Tooltip,
   Typography,
@@ -34,6 +22,19 @@ import dayjs from 'dayjs';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useKaikeiTheme } from '@/app/providers';
 import demoSeedData from '@/lib/seed-data.json';
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  BarChartOutlined,
+  EditOutlined,
+  MoonOutlined,
+  PlusOutlined,
+  ProfileOutlined,
+  ReloadOutlined,
+  SunOutlined,
+  SwapOutlined,
+  WalletOutlined,
+} from '@/app/ui-icons';
 import type {
   BudgetPlan,
   DemoTransactionInput,
@@ -633,7 +634,7 @@ export default function Home() {
             <Text type="secondary">Your money, in one calm place</Text>
             <Tag className="demo-badge">Demo</Tag>
           </div>
-          <Space>
+          <div className="topbar-actions">
             <Tooltip
               title={mode === 'dark' ? 'Use light theme' : 'Use dark theme'}
             >
@@ -663,7 +664,7 @@ export default function Home() {
             >
               <span className="add-button-label">Add transaction</span>
             </Button>
-          </Space>
+          </div>
         </header>
 
         <Content className="content-wrap">
@@ -1086,7 +1087,10 @@ export default function Home() {
           <div className="biggest-purchases-list">
             {biggestPurchases.map((item, index) => (
               <article key={item.id}>
-                <span className="purchase-rank" aria-label={`Rank ${index + 1}`}>
+                <span
+                  className="purchase-rank"
+                  aria-label={`Rank ${index + 1}`}
+                >
                   {index + 1}
                 </span>
                 <div className="purchase-copy">

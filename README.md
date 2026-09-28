@@ -23,6 +23,7 @@ V3.2 keeps the public demo aligned with the current Kaikei experience while pres
 - A moonlit monthly header, seasonal Japanese seal, soft washi texture, and stamp-inspired visual accents built with lightweight SVG and CSS.
 - Updated V3.2 interface labels, metadata, and installable-app manifest.
 - Immediate rendering from bundled synthetic data with transaction and budget editors loaded only when needed.
+- A lighter app shell with compact local SVG controls and offscreen transaction-row rendering containment.
 
 ## What you can try
 

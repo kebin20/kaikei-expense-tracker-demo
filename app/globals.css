@@ -26,10 +26,26 @@
   --seasonal-fiber: rgba(62, 82, 105, 0.045);
   background-color: var(--paper);
   background-image:
-    radial-gradient(circle at 12% 18%, var(--seasonal-fiber) 0 0.7px, transparent 0.9px),
-    radial-gradient(circle at 72% 42%, var(--seasonal-fiber) 0 0.55px, transparent 0.8px),
-    linear-gradient(112deg, transparent 0 48%, rgba(255, 255, 255, 0.22) 49% 50%, transparent 51%);
-  background-size: 19px 17px, 23px 21px, 160px 160px;
+    radial-gradient(
+      circle at 12% 18%,
+      var(--seasonal-fiber) 0 0.7px,
+      transparent 0.9px
+    ),
+    radial-gradient(
+      circle at 72% 42%,
+      var(--seasonal-fiber) 0 0.55px,
+      transparent 0.8px
+    ),
+    linear-gradient(
+      112deg,
+      transparent 0 48%,
+      rgba(255, 255, 255, 0.22) 49% 50%,
+      transparent 51%
+    );
+  background-size:
+    19px 17px,
+    23px 21px,
+    160px 160px;
 }
 
 html[data-theme='dark'] .seasonal-ledger-theme {
@@ -52,7 +68,12 @@ html[data-theme='dark'] .seasonal-ledger-theme {
 
 .seasonal-ledger-theme .seasonal-balance-card {
   background:
-    linear-gradient(90deg, rgba(7, 29, 52, 0.98) 0 38%, rgba(10, 39, 71, 0.72) 68%, rgba(10, 39, 71, 0.18) 100%),
+    linear-gradient(
+      90deg,
+      rgba(7, 29, 52, 0.98) 0 38%,
+      rgba(10, 39, 71, 0.72) 68%,
+      rgba(10, 39, 71, 0.18) 100%
+    ),
     url('/illustrations/seasonal-ledger-night.svg') center / cover no-repeat,
     #102542 !important;
 }
@@ -394,6 +415,33 @@ input:focus-visible,
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.topbar-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.kaikei-ui-icon {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.kaikei-ui-icon > svg {
+  display: block;
+}
+
+.kaikei-ui-icon-spin {
+  animation: kaikei-icon-spin 1s linear infinite;
+}
+
+@keyframes kaikei-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .demo-badge {
@@ -965,6 +1013,8 @@ html[data-theme='dark'] .chart-legend .income-dot {
   list-style: none;
 }
 .transaction-ledger-row {
+  content-visibility: auto;
+  contain-intrinsic-block-size: 78px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -1223,8 +1273,8 @@ html[data-theme='dark'] .chart-legend .income-dot {
     display: flex;
   }
 
-  .topbar > .ant-space {
-    gap: 8px !important;
+  .topbar-actions {
+    gap: 8px;
   }
 
   .topbar .ant-btn {
