@@ -11,32 +11,32 @@ export const metadata: Metadata = {
   applicationName: 'Kaikei Demo V3.2',
   icons: {
     icon: [
-      { url: '/favicon.ico?v=20', sizes: 'any', type: 'image/x-icon' },
+      { url: '/favicon.ico?v=21', sizes: 'any', type: 'image/x-icon' },
       {
-        url: '/favicon-32x32-v20.png',
+        url: '/favicon-32x32-v21.png',
         sizes: '32x32',
         type: 'image/png',
       },
       {
-        url: '/favicon-16x16-v20.png',
+        url: '/favicon-16x16-v21.png',
         sizes: '16x16',
         type: 'image/png',
       },
     ],
-    shortcut: '/favicon.ico?v=20',
+    shortcut: '/favicon.ico?v=21',
     apple: [
       {
-        url: '/apple-touch-icon-v20.png',
+        url: '/apple-touch-icon-v21.png',
         sizes: '180x180',
         type: 'image/png',
       },
       {
-        url: '/apple-touch-icon-167-v20.png',
+        url: '/apple-touch-icon-167-v21.png',
         sizes: '167x167',
         type: 'image/png',
       },
       {
-        url: '/apple-touch-icon-152-v20.png',
+        url: '/apple-touch-icon-152-v21.png',
         sizes: '152x152',
         type: 'image/png',
       },
@@ -91,7 +91,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="manifest" href="/manifest.webmanifest?v=20" />
+        <link rel="manifest" href="/manifest.webmanifest?v=21" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta
@@ -102,22 +102,22 @@ export default function RootLayout({
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href="/apple-touch-icon-v20.png"
+          href="/apple-touch-icon-v21.png"
         />
         <link
           rel="apple-touch-icon"
           sizes="167x167"
-          href="/apple-touch-icon-167-v20.png"
+          href="/apple-touch-icon-167-v21.png"
         />
         <link
           rel="apple-touch-icon"
           sizes="152x152"
-          href="/apple-touch-icon-152-v20.png"
+          href="/apple-touch-icon-152-v21.png"
         />
         <link
           rel="apple-touch-icon-precomposed"
           sizes="180x180"
-          href="/apple-touch-icon-v20.png"
+          href="/apple-touch-icon-v21.png"
         />
         <script dangerouslySetInnerHTML={{ __html: themeInitializer }} />
       </head>

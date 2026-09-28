@@ -568,7 +568,7 @@ export default function Home() {
       <Sider className="desktop-sider" width={216} theme="dark">
         <div className="brand-lockup">
           <img
-            src="/icons/icon-wallet-redesign-128.png"
+            src="/icons/icon-wallet-v21-128.png"
             alt=""
             width={44}
             height={44}
@@ -621,7 +621,7 @@ export default function Home() {
         <header className="topbar">
           <button className="mobile-brand" onClick={() => setView('overview')}>
             <img
-              src="/icons/icon-wallet-redesign-128.png"
+              src="/icons/icon-wallet-v21-128.png"
               alt=""
               width={36}
               height={36}
