@@ -1044,21 +1044,21 @@ export default function Home() {
             onClick={() => setView('overview')}
           >
             <BarChartOutlined />
-            <span>Home</span>
+            <span className="mobile-nav-label">Home</span>
           </button>
           <button
             className={view === 'budgets' ? 'active' : ''}
             onClick={() => setView('budgets')}
           >
             <ProfileOutlined />
-            <span>Budget</span>
+            <span className="mobile-nav-label">Budget</span>
           </button>
           <button
             className={view === 'transactions' ? 'active' : ''}
             onClick={() => setView('transactions')}
           >
             <SwapOutlined />
-            <span>Transactions</span>
+            <span className="mobile-nav-label">Transactions</span>
           </button>
         </nav>
       </Layout>
