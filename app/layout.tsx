@@ -5,10 +5,10 @@ import Providers from './providers';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kaikei-demo-2026.ktanzyl.chatgpt.site'),
-  title: 'Kaikei Demo V3.2 — Personal finance, made clear',
+  title: 'Kaikei Demo V3.3 — Personal finance, made clear',
   description:
-    'Explore the seasonal Kaikei V3.2 experience with synthetic finances stored only in your browser.',
-  applicationName: 'Kaikei Demo V3.2',
+    'Explore the seasonal Kaikei V3.3 experience with synthetic finances stored only in your browser.',
+  applicationName: 'Kaikei Demo V3.3',
   icons: {
     icon: [
       { url: '/favicon.ico?v=21', sizes: 'any', type: 'image/x-icon' },
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'Kaikei Demo V3.2 — Personal finance, made clear',
+    title: 'Kaikei Demo V3.3 — Personal finance, made clear',
     description:
       'Try income, expense, and budget tracking with synthetic sample data.',
     type: 'website',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kaikei Demo V3.2 — Personal finance, made clear',
+    title: 'Kaikei Demo V3.3 — Personal finance, made clear',
     description:
       'Try income, expense, and budget tracking with synthetic sample data.',
     images: ['/og.png'],
