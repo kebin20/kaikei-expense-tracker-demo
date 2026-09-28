@@ -1171,6 +1171,54 @@ html[data-theme='dark'] .chart-legend .income-dot {
   font-size: 17px;
 }
 
+.demo-inline-actual-trigger {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 5px;
+  margin-top: 1px;
+  padding: 2px 5px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--text);
+  background: transparent;
+  cursor: text;
+}
+
+.demo-inline-actual-trigger:hover,
+.demo-inline-actual-trigger:focus-visible {
+  background: var(--surface-soft);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(242, 106, 33, 0.28);
+}
+
+.demo-inline-actual-trigger strong {
+  margin: 0;
+}
+
+.demo-inline-actual-trigger .anticon {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.demo-inline-actual-editor {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 3px;
+}
+
+.demo-inline-actual-editor .ant-input-number {
+  width: 112px;
+}
+
+.demo-inline-actual-editor .ant-btn {
+  min-width: 26px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+}
+
 .budget-card > .ant-card-body > .ant-typography:last-child {
   display: block;
   margin-top: 9px;

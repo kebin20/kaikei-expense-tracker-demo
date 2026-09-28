@@ -9,6 +9,7 @@ import {
   Card,
   Drawer,
   Empty,
+  InputNumber,
   Layout,
   Menu,
   Progress,
@@ -18,6 +19,8 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
+import CheckOutlined from '@ant-design/icons/CheckOutlined';
+import CloseOutlined from '@ant-design/icons/CloseOutlined';
 import dayjs from 'dayjs';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useKaikeiTheme } from '@/app/providers';
@@ -132,6 +135,18 @@ export default function Home() {
   const [savingBudget, setSavingBudget] = useState(false);
   const [flowMode, setFlowMode] = useState<'year' | 'month'>('month');
   const [biggestPurchasesOpen, setBiggestPurchasesOpen] = useState(false);
+  const [editingActualKey, setEditingActualKey] = useState<string | null>(null);
+  const [actualDraft, setActualDraft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!editingActualKey) return;
+    const frame = window.requestAnimationFrame(() => {
+      document
+        .querySelector<HTMLInputElement>('.demo-inline-actual-editor input')
+        ?.focus();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [editingActualKey]);
 
   const loadLedger = () => {
     setError('');
@@ -532,6 +547,63 @@ export default function Home() {
     } finally {
       setSavingBudget(false);
     }
+  };
+
+  const saveInlineActual = (
+    item: BudgetPlan & { actual: number },
+    desiredActual: number,
+  ) => {
+    if (
+      !Number.isFinite(desiredActual) ||
+      desiredActual < 0 ||
+      !Number.isInteger(desiredActual)
+    ) {
+      message.error('Enter a whole-yen amount of ¥0 or more.');
+      return false;
+    }
+    const matches = monthTransactions.filter(
+      (entry) => entry.type === item.type && entry.category === item.category,
+    );
+    if (matches.length > 1) {
+      message.info(
+        'This total combines multiple entries. Edit those entries from Transactions.',
+      );
+      return false;
+    }
+    if (desiredActual === item.actual) return true;
+
+    setLedger((current) => {
+      const existing = matches[0];
+      let transactions = current.transactions;
+      if (existing && desiredActual === 0) {
+        transactions = transactions.filter((entry) => entry.id !== existing.id);
+      } else if (existing) {
+        transactions = transactions.map((entry) =>
+          entry.id === existing.id
+            ? { ...entry, amount: desiredActual, createdAt: Date.now() }
+            : entry,
+        );
+      } else if (desiredActual > 0) {
+        transactions = [
+          makeDemoTransaction({
+            type: item.type,
+            amount: desiredActual,
+            transactionDate:
+              selectedPeriod === dayjs().format('YYYY-MM')
+                ? dayjs().format('YYYY-MM-DD')
+                : `${selectedPeriod}-01`,
+            description: item.category,
+            category: item.category,
+          }),
+          ...transactions,
+        ];
+      }
+      const next = { ...current, transactions };
+      persistDemoLedger(next);
+      return next;
+    });
+    message.success(`${item.category} actual updated`);
+    return true;
   };
 
   if (error) {
@@ -978,6 +1050,8 @@ export default function Home() {
                       ? 100
                       : 0;
                   const difference = item.plannedAmount - item.actual;
+                  const actualKey = `${item.type}:${item.category}`;
+                  const editingActual = editingActualKey === actualKey;
                   return (
                     <Card
                       key={`${item.type}-${item.category}`}
@@ -1001,7 +1075,75 @@ export default function Home() {
                       <div className="budget-amounts">
                         <div>
                           <Text type="secondary">Actual</Text>
-                          <strong>{formatMoney(item.actual)}</strong>
+                          {editingActual ? (
+                            <form
+                              className="demo-inline-actual-editor"
+                              onSubmit={(event) => {
+                                event.preventDefault();
+                                if (
+                                  actualDraft !== null &&
+                                  saveInlineActual(
+                                    item,
+                                    Math.round(actualDraft),
+                                  )
+                                ) {
+                                  setEditingActualKey(null);
+                                  setActualDraft(null);
+                                }
+                              }}
+                            >
+                              <InputNumber
+                                aria-label={`${item.category} actual amount`}
+                                controls={false}
+                                min={0}
+                                precision={0}
+                                prefix="¥"
+                                value={actualDraft}
+                                onChange={(value) =>
+                                  setActualDraft(
+                                    typeof value === 'number' ? value : null,
+                                  )
+                                }
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Escape') {
+                                    setEditingActualKey(null);
+                                    setActualDraft(null);
+                                  }
+                                }}
+                              />
+                              <Button
+                                aria-label={`Save ${item.category} actual amount`}
+                                htmlType="submit"
+                                icon={<CheckOutlined />}
+                                size="small"
+                                type="text"
+                              />
+                              <Button
+                                aria-label="Cancel editing actual amount"
+                                htmlType="button"
+                                icon={<CloseOutlined />}
+                                size="small"
+                                type="text"
+                                onClick={() => {
+                                  setEditingActualKey(null);
+                                  setActualDraft(null);
+                                }}
+                              />
+                            </form>
+                          ) : (
+                            <button
+                              aria-label={`Edit ${item.category} actual amount`}
+                              className="demo-inline-actual-trigger"
+                              type="button"
+                              onClick={() => {
+                                setEditingActualKey(actualKey);
+                                setActualDraft(item.actual);
+                              }}
+                            >
+                              <strong>{formatMoney(item.actual)}</strong>
+                              <EditOutlined />
+                            </button>
+                          )}
                         </div>
                         <div>
                           <Text type="secondary">Planned</Text>
