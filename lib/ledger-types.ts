@@ -19,6 +19,8 @@ export interface BudgetPlan {
   category: string;
   plannedAmount: number;
   updatedAt: number;
+  creditCardGrossAmount?: number | null;
+  creditCardFixedCosts?: number;
 }
 
 export interface LedgerData {

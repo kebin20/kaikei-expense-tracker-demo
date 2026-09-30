@@ -90,7 +90,60 @@ function readDemoLedger() {
 }
 
 function persistDemoLedger(data: LedgerData) {
+  // Keep a saved gross bill linked to changing fixed-cost Actuals.
+  const bills = data.budgets.filter(
+    (budget) => typeof budget.creditCardGrossAmount === 'number',
+  );
+  bills.forEach((bill) => {
+    const fixed = demoCardFixedCosts(bill, data);
+    const net = (bill.creditCardGrossAmount || 0) - fixed;
+    data.transactions = data.transactions.filter(
+      (entry) =>
+        !(
+          entry.period === bill.period &&
+          entry.type === 'expense' &&
+          entry.category === bill.category
+        ),
+    );
+    if (net !== 0)
+      data.transactions.push({
+        ...makeDemoTransaction({
+          type: 'expense',
+          amount: net,
+          transactionDate: `${bill.period}-01`,
+          description: 'Credit Card (bill minus fixed costs)',
+          category: bill.category,
+        }),
+        source: 'demo-card-bill',
+      });
+    data.budgets = data.budgets.map((budget) =>
+      budget.id === bill.id
+        ? { ...budget, creditCardFixedCosts: fixed }
+        : budget,
+    );
+  });
   window.localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(data));
+}
+
+function demoCardFixedCosts(bill: BudgetPlan, data: LedgerData) {
+  const fixed = new Set(
+    data.budgets
+      .filter(
+        (budget) =>
+          budget.period === bill.period &&
+          budget.type === 'expense' &&
+          !/^(rent|credit card|week\s*\d+)$/i.test(budget.category),
+      )
+      .map((budget) => budget.category),
+  );
+  return data.transactions
+    .filter(
+      (entry) =>
+        entry.period === bill.period &&
+        entry.type === 'expense' &&
+        fixed.has(entry.category),
+    )
+    .reduce((sum, entry) => sum + entry.amount, 0);
 }
 
 function demoText(value: unknown) {
@@ -561,6 +614,65 @@ export default function Home() {
       message.error('Enter a whole-yen amount of ¥0 or more.');
       return false;
     }
+    if (
+      item.type === 'expense' &&
+      item.category.toLowerCase() === 'credit card'
+    ) {
+      const fixedCategories = new Set(
+        monthBudgets
+          .filter(
+            (budget) =>
+              budget.type === 'expense' &&
+              !/^(rent|credit card|week\s*\d+)$/i.test(budget.category),
+          )
+          .map((budget) => budget.category),
+      );
+      const fixed = monthTransactions
+        .filter(
+          (entry) =>
+            entry.type === 'expense' && fixedCategories.has(entry.category),
+        )
+        .reduce((sum, entry) => sum + entry.amount, 0);
+      setLedger((current) => {
+        const net = desiredActual - fixed;
+        const transactions = current.transactions.filter(
+          (entry) =>
+            !(
+              entry.period === item.period &&
+              entry.type === 'expense' &&
+              entry.category === item.category
+            ),
+        );
+        if (net !== 0)
+          transactions.push({
+            ...makeDemoTransaction({
+              type: 'expense',
+              amount: net,
+              transactionDate: `${item.period}-01`,
+              description: 'Credit Card (bill minus fixed costs)',
+              category: item.category,
+            }),
+            source: 'demo-card-bill',
+          });
+        const next = {
+          ...current,
+          transactions,
+          budgets: current.budgets.map((budget) =>
+            budget.id === item.id
+              ? {
+                  ...budget,
+                  creditCardGrossAmount: desiredActual,
+                  creditCardFixedCosts: fixed,
+                }
+              : budget,
+          ),
+        };
+        persistDemoLedger(next);
+        return next;
+      });
+      message.success('Credit-card bill saved; fixed costs deducted.');
+      return true;
+    }
     const matches = monthTransactions.filter(
       (entry) => entry.type === item.type && entry.category === item.category,
     );
@@ -650,7 +762,7 @@ export default function Home() {
           <div>
             <div className="brand-title">
               <strong>Kaikei</strong>
-              <span className="version-badge">V3.3</span>
+              <span className="version-badge">V3.4</span>
             </div>
             <span>Personal finance</span>
           </div>
@@ -700,7 +812,7 @@ export default function Home() {
               height={36}
             />
             <strong>Kaikei</strong>
-            <span className="version-badge">V3.3</span>
+            <span className="version-badge">V3.4</span>
           </button>
           <div className="topbar-copy">
             <Text type="secondary">Your money, in one calm place</Text>
@@ -1093,7 +1205,7 @@ export default function Home() {
                               }}
                             >
                               <InputNumber
-                                aria-label={`${item.category} actual amount`}
+                                aria-label={`${item.category} ${item.category.toLowerCase() === 'credit card' ? 'full bill' : 'actual amount'}`}
                                 controls={false}
                                 min={0}
                                 precision={0}
@@ -1137,13 +1249,41 @@ export default function Home() {
                               type="button"
                               onClick={() => {
                                 setEditingActualKey(actualKey);
-                                setActualDraft(item.actual);
+                                setActualDraft(
+                                  item.category.toLowerCase() === 'credit card'
+                                    ? (item.creditCardGrossAmount ??
+                                        item.actual +
+                                          demoCardFixedCosts(item, ledger))
+                                    : item.actual,
+                                );
                               }}
                             >
                               <strong>{formatMoney(item.actual)}</strong>
                               <EditOutlined />
                             </button>
                           )}
+                          {item.type === 'expense' &&
+                            item.category.toLowerCase() === 'credit card' && (
+                              <Text
+                                type="secondary"
+                                className="credit-card-calculation"
+                              >
+                                {editingActual ? 'Full bill' : 'Bill'} −{' '}
+                                {formatMoney(demoCardFixedCosts(item, ledger))}{' '}
+                                fixed costs
+                                {editingActual && actualDraft !== null && (
+                                  <>
+                                    {' '}
+                                    ={' '}
+                                    {formatMoney(
+                                      actualDraft -
+                                        demoCardFixedCosts(item, ledger),
+                                    )}{' '}
+                                    Actual
+                                  </>
+                                )}
+                              </Text>
+                            )}
                         </div>
                         <div>
                           <Text type="secondary">Planned</Text>

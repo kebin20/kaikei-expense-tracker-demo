@@ -1,6 +1,6 @@
 {
   "name": "kaikei-expense-tracker-demo",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "private": true,
   "engines": {
     "node": ">=22.13.0"

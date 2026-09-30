@@ -2,13 +2,17 @@
   <img src="docs/kaikei-demo-v3-banner.png" alt="Kaikei V3.3 — Personal finance, made clear" width="100%" />
 </p>
 
-# Kaikei Demo V3.3
+# Kaikei Demo V3.4
 
 Kaikei Demo is a safe, standalone showcase of the redesigned Kaikei personal-expense tracker. It lets people explore the V3.3 dashboard, transaction, and budget workflows using fictional 2026 finances—without connecting to the private production ledger or Google Sheet.
 
 [Open the hosted demo](https://kaikei-demo-2026.ktanzyl.chatgpt.site)
 
 > **Demo safety:** every included record is synthetic. Changes are saved only in the current browser using `localStorage` and never sync to the production app, Google Sheets, or another visitor.
+
+## V3.4 credit-card bill editor
+
+The inline Credit Card Actual editor accepts the full bill and subtracts the other fixed-cost Actuals, excluding rent. All calculations use fictional browser-local records; the demo never connects to the private spreadsheet.
 
 ## V3.3 performance release
 

@@ -1201,6 +1201,14 @@ html[data-theme='dark'] .chart-legend .income-dot {
   font-size: 12px;
 }
 
+.credit-card-calculation {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 6px;
+  max-width: 190px;
+  overflow-wrap: anywhere;
+}
 .demo-inline-actual-editor {
   display: flex;
   align-items: center;
