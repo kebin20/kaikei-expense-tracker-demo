@@ -32,6 +32,14 @@ function Icon({
   );
 }
 
+export function CheckOutlined(props: IconProps) {
+  return <Icon {...props}><path d="m5 12 4 4L19 6" /></Icon>;
+}
+
+export function CloseOutlined(props: IconProps) {
+  return <Icon {...props}><path d="m6 6 12 12M18 6 6 18" /></Icon>;
+}
+
 export function ArrowDownOutlined(props: IconProps) {
   return (
     <Icon {...props}>
@@ -99,12 +107,10 @@ export function EditOutlined(props: IconProps) {
   );
 }
 
-export function MoreOutlined(props: IconProps) {
+export function MenuOutlined(props: IconProps) {
   return (
     <Icon {...props}>
-      <circle cx="12" cy="5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
-      <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none" />
+      <path d="M4 6h16M4 12h16M4 18h16" />
     </Icon>
   );
 }

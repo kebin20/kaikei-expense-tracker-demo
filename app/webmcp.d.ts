@@ -6,7 +6,10 @@ interface Document {
         title?: string;
         description: string;
         inputSchema: Record<string, unknown>;
-        annotations?: { readOnlyHint?: boolean; untrustedContentHint?: boolean };
+        annotations?: {
+          readOnlyHint?: boolean;
+          untrustedContentHint?: boolean;
+        };
         execute(input: unknown): Promise<unknown>;
       },
       options?: { signal?: AbortSignal },

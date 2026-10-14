@@ -1,38 +1,42 @@
 'use client';
 
-import { App as AntApp, ConfigProvider } from 'antd';
-import { theme as antdTheme } from 'antd';
+import { ConfigProvider, theme as antdTheme } from 'antd';
+import DeferredFeedback from './deferred-feedback';
+import AppErrorBoundary from './app-error-boundary';
 import {
   createContext,
-  type ReactNode,
   useContext,
   useEffect,
   useMemo,
   useState,
+  type ReactNode,
 } from 'react';
 
 type ThemeMode = 'light' | 'dark';
 
-const THEME_STORAGE_KEY = 'kaikei-demo-theme';
-
-const ThemeModeContext = createContext<{
-  mode: ThemeMode;
+interface KaikeiThemeContextValue {
+  themeMode: ThemeMode;
   toggleTheme: () => void;
-}>({ mode: 'light', toggleTheme: () => undefined });
+}
+
+const THEME_STORAGE_KEY = 'kaikei-theme-v1';
+const KaikeiThemeContext = createContext<KaikeiThemeContextValue | null>(null);
 
 export function useKaikeiTheme() {
-  return useContext(ThemeModeContext);
+  const value = useContext(KaikeiThemeContext);
+  if (!value) throw new Error('useKaikeiTheme must be used inside Providers');
+  return value;
 }
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>('light');
+  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      setMode(
-        document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
-      );
+      const initialMode =
+        document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      setThemeMode(initialMode);
       setThemeReady(true);
     });
     return () => window.cancelAnimationFrame(frame);
@@ -40,59 +44,69 @@ export default function Providers({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!themeReady) return;
-    document.documentElement.dataset.theme = mode;
-    document.documentElement.style.colorScheme = mode;
-    window.localStorage.setItem(THEME_STORAGE_KEY, mode);
+    document.documentElement.dataset.theme = themeMode;
+    document.documentElement.style.colorScheme = themeMode;
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+    } catch {
+      // Theme persistence is optional; blocked/full storage must not break the app.
+    }
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', mode === 'dark' ? '#071627' : '#edf3f8');
-  }, [mode, themeReady]);
+      ?.setAttribute('content', themeMode === 'dark' ? '#0b1422' : '#edf2f7');
+  }, [themeMode, themeReady]);
 
-  const theme = useMemo(
+  const themeConfig = useMemo(
     () => ({
       algorithm:
-        mode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        themeMode === 'dark'
+          ? antdTheme.darkAlgorithm
+          : antdTheme.defaultAlgorithm,
       token: {
-        colorPrimary: '#ff7a36',
-        colorInfo: '#ff7a36',
-        colorText: mode === 'dark' ? '#f7f9fc' : '#102542',
-        colorTextSecondary: mode === 'dark' ? '#aebcd0' : '#53647d',
-        colorBgLayout: mode === 'dark' ? '#071627' : '#edf3f8',
-        colorBgContainer: mode === 'dark' ? '#0f2238' : '#ffffff',
-        colorBorder: mode === 'dark' ? '#29405b' : '#d8e1eb',
-        colorBorderSecondary: mode === 'dark' ? '#22364f' : '#e2e9f0',
-        borderRadius: 13,
+        colorPrimary: themeMode === 'dark' ? '#ff7a33' : '#f26a21',
+        colorInfo: themeMode === 'dark' ? '#ff7a33' : '#f26a21',
+        colorText: themeMode === 'dark' ? '#e8f0fa' : '#102542',
+        colorTextSecondary: themeMode === 'dark' ? '#9fb0c5' : '#586579',
+        colorTextPlaceholder: themeMode === 'dark' ? '#9fb0c5' : '#586579',
+        colorBgLayout: themeMode === 'dark' ? '#0b1422' : '#edf2f7',
+        colorBgContainer: themeMode === 'dark' ? '#121f31' : '#ffffff',
+        colorBgElevated: themeMode === 'dark' ? '#17263a' : '#ffffff',
+        colorBorderSecondary: themeMode === 'dark' ? '#27384d' : '#dfe7ef',
+        borderRadius: 12,
         borderRadiusLG: 18,
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         boxShadowSecondary:
-          mode === 'dark'
-            ? '0 16px 40px rgba(0, 0, 0, 0.28)'
-            : '0 14px 36px rgba(16, 37, 66, 0.08)',
+          themeMode === 'dark'
+            ? '0 12px 32px rgba(0, 0, 0, 0.28)'
+            : '0 12px 32px rgba(16, 37, 66, 0.09)',
       },
       components: {
-        Button: { controlHeight: 44, fontWeight: 680 },
+        Button: { controlHeight: 44, fontWeight: 650 },
         Card: { headerFontSize: 16 },
-        Menu: { itemBorderRadius: 13, itemHeight: 46 },
-        Segmented: { itemSelectedBg: mode === 'dark' ? '#1d3653' : '#ffffff' },
+        Menu: { itemBorderRadius: 12, itemHeight: 46 },
       },
     }),
-    [mode],
+    [themeMode],
   );
 
   const themeValue = useMemo(
     () => ({
-      mode,
+      themeMode,
       toggleTheme: () =>
-        setMode((current) => (current === 'dark' ? 'light' : 'dark')),
+        setThemeMode((current) => (current === 'dark' ? 'light' : 'dark')),
     }),
-    [mode],
+    [themeMode],
   );
 
   return (
-    <ThemeModeContext.Provider value={themeValue}>
-      <ConfigProvider theme={theme}>
-        <AntApp>{children}</AntApp>
+    <KaikeiThemeContext.Provider value={themeValue}>
+      <ConfigProvider theme={themeConfig}>
+        <DeferredFeedback>
+          <div className="ant-app kaikei-app-root">
+            <AppErrorBoundary>{children}</AppErrorBoundary>
+          </div>
+        </DeferredFeedback>
       </ConfigProvider>
-    </ThemeModeContext.Provider>
+    </KaikeiThemeContext.Provider>
   );
 }

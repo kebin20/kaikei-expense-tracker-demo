@@ -1,17 +1,19 @@
 {
   "name": "kaikei-expense-tracker-demo",
-  "version": "3.4.0",
+  "version": "3.10.2",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
   },
   "scripts": {
     "dev": "vinext dev",
-    "build": "vinext build",
+    "build": "vinext build && node scripts/prepare-pwa.mjs",
+    "test": "node --test lib/*.test.mjs",
+    "check:startup-bundle": "node scripts/check-startup-budget.mjs",
+    "check:demo-safety": "node scripts/check-demo-safety.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
-    "format": "oxfmt",
-    "db:generate": "drizzle-kit generate"
+    "format": "oxfmt"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",

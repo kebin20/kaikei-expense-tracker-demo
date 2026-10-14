@@ -2,16 +2,21 @@ import type { Metadata, Viewport } from 'next';
 import 'antd/dist/reset.css';
 import './globals.css';
 import Providers from './providers';
+import { bootRecoveryScript } from '@/lib/shell-recovery';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kaikei-demo-2026.ktanzyl.chatgpt.site'),
-  title: 'Kaikei Demo V3.4 — Personal finance, made clear',
+  title: 'Kaikei Demo V3.10.2 — Personal expenses, made clear',
   description:
-    'Explore the seasonal Kaikei V3.4 experience with synthetic finances stored only in your browser.',
-  applicationName: 'Kaikei Demo V3.4',
+    'A browser-local showcase with fictional finances; no spreadsheet or production connection.',
+  applicationName: 'Kaikei Demo V3.10.2',
   icons: {
     icon: [
-      { url: '/favicon.ico?v=21', sizes: 'any', type: 'image/x-icon' },
+      {
+        url: '/favicon.ico?v=21',
+        sizes: '32x32',
+        type: 'image/x-icon',
+      },
       {
         url: '/favicon-32x32-v21.png',
         sizes: '32x32',
@@ -43,9 +48,9 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'Kaikei Demo V3.4 — Personal finance, made clear',
+    title: 'Kaikei Demo V3.10.2 — Personal expenses, made clear',
     description:
-      'Try income, expense, and budget tracking with synthetic sample data.',
+      'Track income, expenses, and monthly budgets in one calm place.',
     type: 'website',
     images: [
       {
@@ -58,9 +63,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kaikei Demo V3.4 — Personal finance, made clear',
+    title: 'Kaikei Demo V3.10.2 — Personal expenses, made clear',
     description:
-      'Try income, expense, and budget tracking with synthetic sample data.',
+      'Track income, expenses, and monthly budgets in one calm place.',
     images: ['/og.png'],
   },
 };
@@ -69,12 +74,12 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#edf3f8',
+  themeColor: '#edf2f7',
 };
 
 const themeInitializer = `
   try {
-    const saved = localStorage.getItem('kaikei-demo-theme');
+    const saved = localStorage.getItem('kaikei-theme-v1');
     const theme = saved === 'light' || saved === 'dark'
       ? saved
       : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -92,13 +97,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.webmanifest?v=21" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
-        <meta name="apple-mobile-web-app-title" content="Kaikei Demo" />
         <link
           rel="apple-touch-icon"
           sizes="180x180"
@@ -119,7 +117,12 @@ export default function RootLayout({
           sizes="180x180"
           href="/apple-touch-icon-v21.png"
         />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Kaikei Demo" />
         <script dangerouslySetInnerHTML={{ __html: themeInitializer }} />
+        <script dangerouslySetInnerHTML={{ __html: bootRecoveryScript }} />
       </head>
       <body>
         <Providers>{children}</Providers>

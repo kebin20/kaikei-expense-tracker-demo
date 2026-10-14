@@ -1,24 +1,9 @@
-import { NextResponse } from 'next/server';
-import { createLedgerTransaction, getLedgerData } from '@/db/ledger';
-import { validateTransactionBody } from '@/lib/validation';
-
-export async function GET() {
-  try {
-    return NextResponse.json(await getLedgerData());
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Kaikei could not load your ledger.' }, { status: 500 });
-  }
+// Demo operations are intercepted in the visitor's browser; no server writes.
+function browserOnly() {
+  return Response.json({ error: 'This demo stores records only in your browser. No server ledger is available.' }, { status: 405 });
 }
-
-export async function POST(request: Request) {
-  try {
-    const input = validateTransactionBody(await request.json());
-    return NextResponse.json(await createLedgerTransaction(input), { status: 201 });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Could not save the transaction.' },
-      { status: 400 },
-    );
-  }
-}
+export const GET = browserOnly;
+export const POST = browserOnly;
+export const PUT = browserOnly;
+export const PATCH = browserOnly;
+export const DELETE = browserOnly;

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#edf2f7" />
+    <title>Kaikei is offline</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: max(24px, env(safe-area-inset-top)) 24px
+          max(24px, env(safe-area-inset-bottom));
+        color: #102542;
+        background: #edf2f7;
+      }
+      main {
+        width: min(430px, 100%);
+        padding: 32px;
+        text-align: center;
+        border: 1px solid #dfe7ef;
+        border-radius: 24px;
+        background: #fff;
+        box-shadow: 0 18px 48px rgba(16, 37, 66, 0.1);
+      }
+      img {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+      }
+      h1 {
+        margin: 20px 0 8px;
+        font-size: 28px;
+      }
+      p {
+        margin: 0 0 24px;
+        color: #637083;
+        line-height: 1.5;
+      }
+      button {
+        min-height: 46px;
+        padding: 0 24px;
+        border: 0;
+        border-radius: 14px;
+        color: #102542;
+        background: #f26a21;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #e8f0fa;
+          background: #0b1422;
+        }
+        main {
+          border-color: #27384d;
+          background: #121f31;
+        }
+        p {
+          color: #9fb0c5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img
+        src="/icons/icon-wallet-v21-128.png"
+        alt=""
+        width="64"
+        height="64"
+      />
+      <h1>Kaikei is offline</h1>
+      <p>Your saved data is safe. Reconnect, then try opening Kaikei again.</p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>

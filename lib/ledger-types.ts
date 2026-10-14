@@ -19,6 +19,7 @@ export interface BudgetPlan {
   category: string;
   plannedAmount: number;
   updatedAt: number;
+  recurring?: boolean;
   creditCardGrossAmount?: number | null;
   creditCardFixedCosts?: number;
 }
@@ -29,6 +30,8 @@ export interface LedgerData {
   initialBalance: number;
   sourceFile: string;
   seedVersion: string;
+  syncMode?: 'database' | 'google-sheets';
+  syncedAt?: string;
 }
 
 export interface DemoTransactionInput {
