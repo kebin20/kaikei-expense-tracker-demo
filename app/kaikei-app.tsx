@@ -13,6 +13,7 @@ import {
   replaceTransaction,
 } from '@/lib/transaction-order';
 import { defaultLedgerPeriod } from '@/lib/calendar-period';
+import { budgetWeekNumber, budgetWeekRange } from '@/lib/budget-weeks';
 import {
   weeklyCategoryNumber,
   preserveWeeklyIdentity,
@@ -474,9 +475,10 @@ function calculateSpendingGuide(
       : today.isBefore(start)
         ? start
         : end;
-  const week = Math.min(4, Math.max(1, Math.ceil(anchor.date() / 7)));
-  const weekStart = start.date((week - 1) * 7 + 1);
-  const weekEnd = week === 4 ? end : start.date(week * 7);
+  const week = budgetWeekNumber(anchor.date());
+  const range = budgetWeekRange(selectedPeriod, week);
+  const weekStart = start.date(range.startDay);
+  const weekEnd = start.date(range.endDay);
   const elapsedDays = Math.max(1, anchor.diff(weekStart, 'day') + 1);
   const weekDays = Math.max(1, weekEnd.diff(weekStart, 'day') + 1);
   const daysRemaining = Math.max(1, weekEnd.diff(anchor, 'day') + 1);
@@ -615,16 +617,13 @@ function categoryIllustration(category: string) {
 function transactionWeekNumber(item: LedgerTransaction) {
   const categoryWeek = weeklyCategoryNumber(item.category);
   if (categoryWeek) return categoryWeek;
-  return Math.min(
-    4,
-    Math.max(1, Math.ceil(dayjs(item.transactionDate).date() / 7)),
-  );
+  return budgetWeekNumber(dayjs(item.transactionDate).date());
 }
 
 function defaultTransactionWeek(period: string, todayDate: string) {
   const today = dayjs(todayDate);
   return today.format('YYYY-MM') === period
-    ? String(Math.min(4, Math.max(1, Math.ceil(today.date() / 7))))
+    ? String(budgetWeekNumber(today.date()))
     : '1';
 }
 
@@ -2514,7 +2513,7 @@ export default function KaikeiApp({
       const file = {
         ...snapshot,
         exportedAt: new Date().toISOString(),
-        version: '3.10.2',
+        version: '3.10.4',
         queuedTransactions: readStoredArray<TransactionInput>(OUTBOX_KEY),
         recoveryDrafts: exportRecoveryRecords(),
       };
@@ -2550,7 +2549,7 @@ export default function KaikeiApp({
           {
             kind: 'kaikei-recovery-only',
             exportedAt: new Date().toISOString(),
-            version: '3.10.2',
+            version: '3.10.4',
             queuedTransactions: readStoredArray<TransactionInput>(OUTBOX_KEY),
             recoveryDrafts: exportRecoveryRecords(),
           },
@@ -4094,7 +4093,7 @@ export default function KaikeiApp({
           <div>
             <div className="brand-name-row">
               <strong>Kaikei</strong>
-              <span className="version-badge">V3.10.2</span>
+              <span className="version-badge">V3.10.4</span>
             </div>
             <span className="brand-subtitle">Personal finance</span>
           </div>
@@ -4175,7 +4174,7 @@ export default function KaikeiApp({
               height={36}
             />
             <strong>Kaikei</strong>
-            <span className="version-badge">V3.10.2</span>
+            <span className="version-badge">V3.10.4</span>
           </button>
           <div className="topbar-copy">
             <Text type="secondary">Your money, in one calm place</Text>
@@ -4450,6 +4449,10 @@ export default function KaikeiApp({
                 >
                   <div className="budget-pulse-grid">
                     {budgetPulse.map((item) => {
+                      const range = budgetWeekRange(
+                        item.period,
+                        weeklyCategoryNumber(item.category)!,
+                      );
                       const percent = item.plannedAmount
                         ? Math.round((item.actual / item.plannedAmount) * 100)
                         : 0;
@@ -4462,6 +4465,7 @@ export default function KaikeiApp({
                             type="button"
                             className="pulse-week-surface"
                             aria-label={`View ${item.category} transactions`}
+                            aria-describedby={`${item.id}-week-range`}
                             onClick={() =>
                               openWeekTransactions(
                                 weeklyCategoryNumber(item.category)!,
@@ -4472,6 +4476,13 @@ export default function KaikeiApp({
                             <Text strong>{item.category}</Text>
                             <Text>{formatMoney(item.actual)}</Text>
                           </div>
+                          <Text
+                            type="secondary"
+                            className="pulse-week-range"
+                            id={`${item.id}-week-range`}
+                          >
+                            {range.label}
+                          </Text>
                           {budgetSaveKey ===
                             `${item.period}:${item.type}:${item.category}` && (
                             <output className="budget-pending-label">

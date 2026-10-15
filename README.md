@@ -1,4 +1,4 @@
-# Kaikei Demo V3.10.2
+# Kaikei Demo V3.10.4
 
 <p align="center"><img src="docs/kaikei-demo-v3-banner.png" alt="Kaikei Demo — Personal finance, made clear" width="100%" /></p>
 
@@ -15,9 +15,9 @@ The current Kaikei interface with fictional finances and browser-only saves.
 - Export/rehearse a fictional backup, view History, switch themes, or reset.
 
 <details>
-<summary><strong>Recent highlights — V3.10.2</strong></summary>
+<summary><strong>Recent highlights — V3.10.4</strong></summary>
 
-- Current production UI, including the duplicate-row and modal-footer fixes.
+- Month-aware weekly date ranges, matching week navigation, and transaction/modal fixes.
 - Daily groups, filters, Undo, duplicate checks, and recent-purchase shortcuts.
 - Recurring month setup, category editing/reordering, export and rehearsal.
 - Lazy startup/feedback, offline shell caching, and responsive layout polish.

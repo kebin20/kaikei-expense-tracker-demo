@@ -6,10 +6,10 @@ import { bootRecoveryScript } from '@/lib/shell-recovery';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kaikei-demo-2026.ktanzyl.chatgpt.site'),
-  title: 'Kaikei Demo V3.10.2 — Personal expenses, made clear',
+  title: 'Kaikei Demo V3.10.4 — Personal expenses, made clear',
   description:
     'A browser-local showcase with fictional finances; no spreadsheet or production connection.',
-  applicationName: 'Kaikei Demo V3.10.2',
+  applicationName: 'Kaikei Demo V3.10.4',
   icons: {
     icon: [
       {
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'Kaikei Demo V3.10.2 — Personal expenses, made clear',
+    title: 'Kaikei Demo V3.10.4 — Personal expenses, made clear',
     description:
       'Track income, expenses, and monthly budgets in one calm place.',
     type: 'website',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kaikei Demo V3.10.2 — Personal expenses, made clear',
+    title: 'Kaikei Demo V3.10.4 — Personal expenses, made clear',
     description:
       'Track income, expenses, and monthly budgets in one calm place.',
     images: ['/og.png'],

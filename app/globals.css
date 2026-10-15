@@ -1232,6 +1232,14 @@ html[data-theme='dark'] .transaction-day-group {
 .pulse-week-link {
   position: relative;
 }
+.pulse-week-range {
+  display: block;
+  margin-block: 4px 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .pulse-week-surface {
   position: absolute;
   inset: 0;

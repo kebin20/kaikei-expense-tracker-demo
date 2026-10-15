@@ -1,7 +1,7 @@
 {
-  "name": "Kaikei Demo V3.10.2 — Personal Expense Tracker",
+  "name": "Kaikei Demo V3.10.4 — Personal Expense Tracker",
   "short_name": "Kaikei Demo",
-  "description": "Explore Kaikei V3.10.2 with fictional finances stored only in this browser.",
+  "description": "Explore Kaikei V3.10.4 with fictional finances stored only in this browser.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
